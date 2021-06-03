@@ -22,19 +22,18 @@ class BattleLogic:
         self.loop = False
 
 class SingleBattleLogic(BattleLogic):
-    def __init__(self, player: Character, enemy: Character) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self._type = "Single"
-        self.player = player
-        self.enemy = enemy
 
-    def fight(self):
+    def fight(self, player: Character, enemy: Character):
         self._run()
         while self.loop:
-            if self.player.isdead() or self.enemy.isdead():
+            if player.isdead() or enemy.isdead():
                 self._stop()
             print("LOOPING")
 
 
 if __name__ == "__main__":
-    pass
+    player, enemy = Character(), Character()
+    logic = SingleBattleLogic(player, enemy)
+    logic.fight()
