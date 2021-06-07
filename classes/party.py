@@ -1,4 +1,0 @@
-
-
-class Party:
-    pass
