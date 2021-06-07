@@ -8,6 +8,6 @@ user = {
 }
 
 system = {
-    "autoSave": False,
+    "auto_save": False,
     "root": os.path.dirname(sys.argv[0])
 }
