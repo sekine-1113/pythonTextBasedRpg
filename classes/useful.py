@@ -1,5 +1,3 @@
-
-
 class Dictable:
     def asdict(self):
         r = {}
