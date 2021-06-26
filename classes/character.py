@@ -1,4 +1,8 @@
-class Status:
+from classes.useful import Dictable
+
+
+
+class Status(Dictable):
     def __init__(self, hp, mp, strength, deffence, luck):
         self.hp = hp
         self.mp = mp
@@ -6,21 +10,13 @@ class Status:
         self.deffence = deffence
         self.luck = luck
 
-    def show(self):
-        print(vars(self))
-        return vars(self)
 
-
-class Character:
+class Character(Dictable):
     def __init__(self, name: str, status: Status, item: dict, money: int) -> None:
         self.name = name
         self.status = status
         self.item = item
         self.money = money
-
-    def show(self):
-        print(vars(self))
-        return vars(self)
 
 
 class Player(Character):
@@ -50,4 +46,5 @@ if __name__ == "__main__":
             data["luck"]
     )
     player = Player("プレイヤー", status, {}, 0, 0)
-    player.show()
+    p = player.asdict()
+    print(p)
