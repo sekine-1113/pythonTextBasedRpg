@@ -1,3 +1,4 @@
 
 class Battle:
-    pass
+    def __init__(self, logic=None) -> None:
+        pass

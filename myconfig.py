@@ -46,6 +46,10 @@ user = {
     "money" : 0,
 }
 
+user_const = {
+    "limit": {}
+}
+
 system = {
     "auto_save": False,
     "root": os.path.dirname(sys.argv[0])
