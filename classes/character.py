@@ -18,7 +18,6 @@ class Character(Dictable):
         self.item = item
         self.money = money
 
-
 class Player(Character):
     def __init__(self, name, status, item, money, equipment) -> None:
         super().__init__(name, status, item, money)
