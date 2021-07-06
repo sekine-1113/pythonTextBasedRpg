@@ -1,6 +1,7 @@
 # text based rpg
 
 ## 仕様
+
 - ? MiniGame
 - Gacha
     - Normal
@@ -10,6 +11,8 @@
     - Normal
     - Special
     - Limited
+        - Enemy
+            - Param (any)
 - Shop
     - Item
     - Equipment
@@ -17,12 +20,13 @@
 
 
 ### 仮案1
+
 - Player
     - Name
     - Rank
     - ? Passive
     - Status
-        - JobClassName
+        - JobClassName ( role )
         - Level
         - HitPoint
         - MagicPower
@@ -42,6 +46,7 @@
 
 
 ### 仮案2
+
 - Player
     - Name
     - Rank
@@ -65,7 +70,9 @@
 
 
 ## その他
+
 GoF
+
 - オブザーバーパターン
 - コマンドパターン
 - プロトタイプパターン
@@ -73,5 +80,6 @@ GoF
 - ステートパターン
 
 Anything
+
 - ブリードパターン
 

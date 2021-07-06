@@ -1,0 +1,15 @@
+{
+    "name": "goblin",
+    "id": 0,
+    "stats": {
+        "maxHP": 1200,
+        "HP": 1200,
+        "maxMP": 200,
+        "MP": 200,
+        "STR": 120,
+        "MSTR": 360,
+        "DEFF": 80,
+        "MDEFF": 160,
+        "EXP": 4
+    }
+}
