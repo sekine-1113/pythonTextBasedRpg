@@ -23,17 +23,16 @@
 
 - Player
     - Name
-    - Rank
+    - RankExp -> Rank
     - ? Passive
     - Status
         - JobClassName ( role )
-        - Level
         - HitPoint
         - MagicPower
         - Strength
-        - Deffence
+        - Defence
         - Speed
-        - Exp
+        - Exp -> Level
         - and so on
     - Money
     - GachaItem
@@ -78,6 +77,13 @@ GoF
 - プロトタイプパターン
 - シングルトンパターン
 - ステートパターン
+- プロキシーパターン
+- ストラテジーパターン
+- コンポジットパターン
+- インタープリターパターン
+- メメントパターン
+
+
 
 Anything
 
