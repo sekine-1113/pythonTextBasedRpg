@@ -1,3 +1,5 @@
+# item, weapon, armor, accessory in Inventory
+
 
 class Inventory:
 
