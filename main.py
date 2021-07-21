@@ -12,6 +12,7 @@ path = r"D:\myscript\games\cui\textbasedrpg\data\user.json"
 with open(path, "r", encoding="UTF-8") as f:
     user = json.load(f)
 
+
 player = Player(
     user["name"],
     Rank(**user["rank"]),
@@ -19,6 +20,7 @@ player = Player(
     user["item"],
     user["role"]
 )
+
 
 print(player.rank.calc_rank())
 player.rank.next_rank_exp(player.rank.calc_rank())
