@@ -6,6 +6,7 @@ from character.status.rank import Rank
 from character.status.exp import Exp
 from item.money import Money
 
+
 path = r"D:\myscript\games\cui\textbasedrpg\data\user.json"
 
 with open(path, "r", encoding="UTF-8") as f:
