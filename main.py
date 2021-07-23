@@ -1,31 +1,25 @@
-import json
-
-from character.player import Player
-from character.role import Role
-from character.status.rank import Rank
-from character.status.exp import Exp
-from item.money import Money
 
 
-path = r"D:\myscript\games\cui\textbasedrpg\data\user.json"
+enemies = [
+    {"name": "Goblin"}
+]
 
-with open(path, "r", encoding="UTF-8") as f:
-    user = json.load(f)
+class Goblin:
+    def __init__(self, health, mana, nickname=None) -> None:
+        self.__name = "Goblin"
+        self._nickname = nickname
+        self.health = health
+        self.mana = mana
 
+    @property
+    def name(self):
+        return self.__name
 
-player = Player(
-    user["name"],
-    Rank(**user["rank"]),
-    Money(**user["money"]),
-    user["item"],
-    user["role"]
-)
-
-
-print(player.rank.calc_rank())
-player.rank.next_rank_exp(player.rank.calc_rank())
-e = player.rank.diff_next_rank_exp()
-player.rank.gain_exp(e)
-print(player.rank.calc_rank())
+    def echo_nickname_and_name(self):
+        print(self._nickname, "of", self.__name)
 
 
+goblin = Goblin(60, 20, "Bob")
+print(goblin.name)
+print(goblin.health)
+print(goblin.mana)
