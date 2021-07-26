@@ -5,62 +5,63 @@ sys.path.append(os.path.dirname(sys.argv[0]))
 from myfunc import *
 
 
-class Battler:
-    def on_turn(self):
-        pass
 
-
-class Wizard:
-    def __init__(self) -> None:
-        self.name = "Wizard"
-        self.health = 0
-        self.mana = 0
-
-
-class Player(Battler):
-    def __init__(self, name: str, class_: Wizard) -> None:
+class Weapon:
+    def __init__(self, name, power) -> None:
         self.name = name
-        self.class_ = class_
+        self.power = power
+        self.damage_up = 0.01
 
-    def on_turn(self):
-        print("choose action.")
-
-
-class Goblin:
-    def __init__(self) -> None:
-        self.name = "Goblin"
-        self.health = 0
-        self.mana = 0
+    def __repr__(self) -> str:
+        return self.name
 
 
-class Enemy(Battler):
-    def __init__(self, name: str, class_: Goblin) -> None:
-        self.name = name
-        self.class_ = class_
-
-    def on_turn(self):
-        print("Enemy's action...")
+class Sword(Weapon):
+    def __init__(self, name, power) -> None:
+        super().__init__(name, power)
 
 
-def main():
-    db_fp: str = os.path.join(
-        os.path.dirname(sys.argv[0]), "database.json"
-    )
-    db: dict = read_json(db_fp)
-    player: Player = Player(db["player"]["name"], Wizard())
-    enemy: Enemy = Enemy(db["enemy"]["goblin"]["name"], Goblin())
+class Player:
+    def __init__(self, health, power, weapon) -> None:
+        self.name = "アリス"
+        self.weapon = weapon
+        self.health = health
+        self.power = power
 
-    while True:
-        player.on_turn()
-        enemy.on_turn()
+    def add_weapon_power(self):
+        return self.power + self.weapon.power
 
-        enemy.class_.health = 0
-
-        if enemy.class_.health <= 0:
-            break
-
-    print(player.name, "win!")
+    def attack(self, target):
+        power = self.add_weapon_power()
+        power = int(power * (1+self.weapon.damage_up))
+        target.health -= power
 
 
-if __name__ == "__main__":
-    main()
+class Enemy:
+    def __init__(self, health, power) -> None:
+        self.name = "ゴブリン"
+        self.weapon = Weapon("なし", 0)
+        self.health = health
+        self.power = power
+
+    def add_weapon_power(self):
+        return self.power + self.weapon.power
+
+    def attack(self, target: Player):
+        power = self.add_weapon_power()
+        power = int(power * (1+self.weapon.damage_up))
+        target.health -= power
+
+
+
+player = Player(30, 10, Sword("どうのつるぎ", 5))
+enemy = Enemy(25, 12)
+
+while player.health > 0:
+    print(player.name, player.health)
+    player.attack(enemy)
+    print(enemy.name, enemy.health)
+    enemy.attack(player)
+
+print(player.name, player.health)
+print(enemy.name, enemy.health)
