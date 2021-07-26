@@ -1,9 +1,13 @@
 import os, sys
-import json
+sys.path.append(os.path.dirname(sys.argv[0]))
 
-def read_json(fp):
-    with open(fp, "r", encoding="UTF-8") as f:
-        return json.load(f)
+
+from myfunc import *
+
+
+class Battler:
+    def on_turn(self):
+        pass
 
 
 class Wizard:
@@ -13,10 +17,13 @@ class Wizard:
         self.mana = 0
 
 
-class Player:
+class Player(Battler):
     def __init__(self, name: str, class_: Wizard) -> None:
         self.name = name
         self.class_ = class_
+
+    def on_turn(self):
+        print("choose action.")
 
 
 class Goblin:
@@ -26,19 +33,33 @@ class Goblin:
         self.mana = 0
 
 
-class Enemy:
+class Enemy(Battler):
     def __init__(self, name: str, class_: Goblin) -> None:
         self.name = name
         self.class_ = class_
 
+    def on_turn(self):
+        print("Enemy's action...")
+
 
 def main():
-    db_fp: str = os.path.join(os.path.dirname(sys.argv[0]), "database.json")
+    db_fp: str = os.path.join(
+        os.path.dirname(sys.argv[0]), "database.json"
+    )
     db: dict = read_json(db_fp)
     player: Player = Player(db["player"]["name"], Wizard())
     enemy: Enemy = Enemy(db["enemy"]["goblin"]["name"], Goblin())
-    print(player.class_.name)
-    print(enemy.class_.name)
+
+    while True:
+        player.on_turn()
+        enemy.on_turn()
+
+        enemy.class_.health = 0
+
+        if enemy.class_.health <= 0:
+            break
+
+    print(player.name, "win!")
 
 
 if __name__ == "__main__":
