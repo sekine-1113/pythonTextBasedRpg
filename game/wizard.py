@@ -9,11 +9,13 @@ class Wizard(Role):
                 strength, defence, intelligence,
                 luck, exp, weapon, good_weapon,
                 armor, accessory1, accessory2) -> None:
+
         self.name = "ウィザード"
         super().__init__(self.name, level, hitpoint, magicpower,
                         strength, defence, intelligence,
                         luck, exp, weapon, good_weapon,
                         armor, accessory1, accessory2)
+
 
 
 

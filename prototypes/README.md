@@ -146,3 +146,11 @@
 
 ## money, and jewel
 
+## Quest
+
+- Name > **討伐
+
+- 報酬
+
+- 戦闘
+
