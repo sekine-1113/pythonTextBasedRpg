@@ -25,6 +25,8 @@ class Actor:
         target.hitpoint -= damage
 
     def choose_skill(self):
+        if self.skill is None:
+            return 0
         for i, v in enumerate(self.skill):
             print(i, v)
         n = int(input(">> "))
