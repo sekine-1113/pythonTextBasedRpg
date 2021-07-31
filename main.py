@@ -54,19 +54,26 @@ def main():
         1: Wizard,
         2: Fighter,
     }
+    stats = {
+        1: {"hp":1200, "str":300},
+        2: {"hp":1500, "str":400}
+    }
     for k, v in roles.items():
         print(k, v.__name__)
     i = int(input(">> "))
-    player: Actor = roles[i](1200, 300)
+    player: Actor = roles[i](stats[i]["hp"], stats[i]["str"])
     goblin = Goblin(800, 120)
     print(f"{goblin.name}", "があらわれた")
     while True:
         player.attack(goblin)
+        if goblin.hitpoint <= 0:
+            print("Killed!")
+            break
         goblin.attack(player)
         if player.hitpoint <= 0:
+            print("Dead!")
             break
-        if goblin.hitpoint <= 0:
-            break
+
 
 
 main()
