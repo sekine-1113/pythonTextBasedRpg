@@ -11,44 +11,27 @@ Quests ->
     ...
 """
 
-class Quests:
-    def __init__(self) -> None:
-        self.questList = []
-
-    def add(self, questSeq):
-        self.questList.append(questSeq)
-
-class QuestList(list):
-    pass
+quests_data = {
+    "1to5": {
+        "id": 1,
+        "title": "Defeat Slime",
+        "description": "Defeat slime",
+        "reward": {"Herb": 0.8, "Good Herb": 0.2}
+    },
+    "6to10": {
+        "id": 2,
+        "title": "Defeat Goblin",
+        "description": "Defeat goblin",
+        "reward": {"Herb": 0.85, "Good Herb": 0.15}
+    }
+}
 
 class Quest:
-    def __init__(self, name, desc=None) -> None:
-        self.name = name
-        self.desc = desc
+    def __init__(self, id, title, description, reward) -> None:
+        self.id = id
+        self.title = title
+        self.desc = description
+        self.reward = reward
 
-    def __str__(self) -> str:
-        return self.__repr__()
-
-    def __repr__(self):
-        return f"Quest {self.name}:'{self.desc}'"
-
-qs = Quests()
-ql = QuestList()
-ql.append(Quest("No.1", "Slime"))
-ql.append(Quest("No.2", "Goblin"))
-ql.append(Quest("No.3", "Dragon"))
-ql.append(Quest("No.4", "Demon"))
-ql.append(Quest("No.5", "God"))
-qs.add(ql)
-ql2 = QuestList()
-ql2.append(Quest("No.6", "Slime"))
-ql2.append(Quest("No.7", "Goblin"))
-ql2.append(Quest("No.8", "Dragon"))
-ql2.append(Quest("No.9", "Demon"))
-ql2.append(Quest("No.10", "God"))
-qs.add(ql2)
-
-for qls in qs.questList:
-    for i in range(5):
-        print(qls[i])
-    print("="*23)
+    def __repr__(self) -> str:
+        return f"{self.id=} {self.title=} {self.desc=} {self.reward=}"
