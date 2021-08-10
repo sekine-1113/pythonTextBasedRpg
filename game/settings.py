@@ -2,19 +2,24 @@
 
 """
 
-data = {
-    "name": "Alice"
+from hashlib import sha256
+from getpass import getpass
+
+
+user = {
+    "name": "Bob",
+    "password": ""
 }
 
+password = ""
 
-class Character:
-    pass
+while len(password) < 4:
+    password = getpass()
+    print(password)
+    a = sha256(password.encode()).hexdigest()
+    print(a)
 
+user["password"] = a
+print(user["password"])
 
-class Player:
-    pass
-
-
-class Enemy:
-    pass
 
