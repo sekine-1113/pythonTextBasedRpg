@@ -6,6 +6,21 @@ from hashlib import sha256
 from getpass import getpass
 import random
 import string
+import secrets
+
+
+def make_ntoken(n: int=4):
+    """make n bits token.
+
+    args:
+        (int) n: default = 4
+    returns:
+        (str) n bits token string.
+    """
+    alphabet = string.ascii_letters + string.digits
+    password = "".join(secrets.choice(alphabet) for _ in range(n))
+    print(password)
+    return password
 
 
 user = {
@@ -22,9 +37,8 @@ def make_id():
     return user_id
 
 
-def make_pass():
+def make_password():
     password = ""
-
     while len(password) < 4:
         password = getpass()
     user_password = sha256(password.encode())
@@ -40,14 +54,17 @@ def authrizer(database, user_id, user_hased_password):
     return valid
 
 
+def main():
+    user_id = make_id()
+    print("ID:", user_id)
+    user["id"] = user_id
+    user_pass = make_password()
+    user["password"] = user_pass
 
-user_id = make_id()
-print("ID:", user_id)
-user["id"] = user_id
-user_pass = make_pass()
-user["password"] = user_pass
+    if authrizer(user, user_id, user_pass):
+        print("Login!")
+    else:
+        print("Invalid")
 
-if authrizer(user, user_id, user_pass):
-    print("Login!")
-else:
-    print("Invalid")
+
+make_ntoken(16)
