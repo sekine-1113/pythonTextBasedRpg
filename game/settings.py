@@ -31,7 +31,7 @@ def make_pass():
     return user_password.hexdigest()
 
 
-def authrize(database, user_id, user_hased_password):
+def authrizer(database, user_id, user_hased_password):
     valid = True
     if database["id"] != user_id:
         valid = False
@@ -47,7 +47,7 @@ user["id"] = user_id
 user_pass = make_pass()
 user["password"] = user_pass
 
-if authrize(user, user_id, user_pass):
+if authrizer(user, user_id, user_pass):
     print("Login!")
 else:
     print("Invalid")
