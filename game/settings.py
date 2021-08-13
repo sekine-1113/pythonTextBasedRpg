@@ -9,15 +9,15 @@ import string
 import secrets
 
 
-def create_ntoken(n: int=4):
+def create_ntoken(n: int=16):
     """make N bits token.
 
     args:
-        (int) n: default = 4
+        (int) n: default = 16
     returns:
         (str) n bits token string.
 
-        ex. "Ag9aHGia5hndHg9r..."
+        ex. "WdbIiZRF7uC3eSJj"
     """
     alphabet = string.ascii_letters + string.digits
     token = "".join(secrets.choice(alphabet) for _ in range(n))
