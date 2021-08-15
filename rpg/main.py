@@ -1,2 +1,2 @@
-
+print("RPG main")
 
