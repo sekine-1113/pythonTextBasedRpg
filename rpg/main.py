@@ -1,13 +1,18 @@
-print("RPG main")
+import unittest
 
 
-class Player:
-    pass
+class TestTashizan(unittest.TestCase):
+    """test class of tashizan
+    """
+
+    def test_tashizan(self):
+        """test method for tashizan
+        """
+        val1 = 1
+        val2 = 5
+        ans = 6
+        self.assertEqual(ans, val1+val2)
 
 
-class Enemy:
-    pass
-
-
-def main():
-    print("main func")
+if __name__ == "__main__":
+    unittest.main()
