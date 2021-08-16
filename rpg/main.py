@@ -8,3 +8,6 @@ class Player:
 class Enemy:
     pass
 
+
+def main():
+    print("main func")
