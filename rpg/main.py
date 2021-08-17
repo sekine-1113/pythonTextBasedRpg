@@ -1,17 +1,22 @@
 import unittest
 
 
-class TestTashizan(unittest.TestCase):
+class Player:
+    def __init__(self, name) -> None:
+        self.name = name
+
+
+class TestPlayer(unittest.TestCase):
     """test class of tashizan
     """
 
-    def test_tashizan(self):
+    def test_player(self):
         """test method for tashizan
         """
-        val1 = 1
-        val2 = 5
-        ans = 6
-        self.assertEqual(ans, val1+val2)
+        player_name = "Bob"
+        player = Player(player_name)
+        name = "Bob"
+        self.assertEqual(player.name, name)
 
 
 if __name__ == "__main__":
