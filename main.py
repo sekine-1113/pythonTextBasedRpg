@@ -15,6 +15,7 @@ class TestSample(unittest.TestCase):
         a, b = 2, 5
         c = 7
         self.assertTrue(a+b==c)
+        # in that case:
         # false
         # self.assertFalse()
 
