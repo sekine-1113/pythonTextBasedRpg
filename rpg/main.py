@@ -1,43 +1,33 @@
+import random
 
 
-class Tag:
-    def __init__(self, _id, name) -> None:
-        self._id = _id
-        self.name = name
+DRAW, PLAYER_WIN, PLAYER_LOSE = range(3)  # 0, 1, 2
 
-    def __repr__(self) -> str:
-        return f"[{self._id} {self.name}]"
+hand = {
+    1: "グー",
+    2: "チョキ",
+    3: "パー"
+}
 
-
-class TagList:
-    def __init__(self, _list) -> None:
-        self._list = _list
-
-    def getByName(self, name):
-        for n in self._list:
-            if n.name == name:
-                print("Find")
-                return n
-        print("Not found.")
-
-    def getById(self, _id):
-        for n in self._list:
-            if n._id == _id:
-                print("Find")
-                return n
-        print("Not found.")
-
-
-tags = [
-    Tag(0, "タグ1"),
-    Tag(1, "タグ2"),
-    Tag(2, "タグ3"),
+hand_win = [
+    [DRAW, PLAYER_WIN, PLAYER_LOSE],
+    [PLAYER_LOSE, DRAW, PLAYER_WIN],
+    [PLAYER_WIN, PLAYER_LOSE, DRAW]
 ]
 
-tl = TagList(tags)
+ai_hand = random.randint(1, 3)
 
-t = tl.getById(2)
-print(t)
+player_hand = 0
+while not 0 < player_hand < 4:
+    player_hand = int(input())
 
-"""to be continuted
-"""
+print(hand[player_hand], hand[ai_hand])
+
+win = hand_win[player_hand-1][ai_hand-1] == PLAYER_WIN
+lose = hand_win[player_hand-1][ai_hand-1] == PLAYER_LOSE
+
+msg = "PLAYER WIN" if win is True \
+    else "PLAYER LOSE" if lose is True \
+    else "DRAW"
+
+print(msg)  # OK
