@@ -16,4 +16,6 @@ class PowerUp:
         self.description = """Power Up!"""
         print(self.description)
 
-PowerUp()
+
+player = Character()
+player.buff = PowerUp()
