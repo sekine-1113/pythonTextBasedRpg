@@ -9,7 +9,6 @@ class Character:
         self.debuff = None
         self.buff = None
 
-
 class PowerUp:
     def __init__(self) -> None:
         self.effect = 1.5
@@ -18,4 +17,3 @@ class PowerUp:
 
 
 player = Character()
-player.buff = PowerUp()
