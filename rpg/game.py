@@ -1,38 +1,34 @@
-from abc import ABC, abstractmethod
+class Key(int):
+    pass
 
 
-class Printer(ABC):
-    @abstractmethod
-    def print_(self):
-        ...
+def keyGen() -> Key:
+    return Key("01011111", 2)
 
 
-class ConsolePrinter(Printer):
-    def __init__(self) -> None:
-        super().__init__()
-
-    def print_(self, *args):
-        print(*args)
+def Enc(m: str, key: Key) -> None:
+    return int(m) ^ key
 
 
-class FilePrinter(Printer):
-    def __init__(self, fp) -> None:
-        super().__init__()
-        self.fp = fp
+def Dec(c: str, key: Key) -> None:
+    return int(c) ^ key
 
-    def print_(self, *args):
-        with open(self.fp, "w", encoding="utf-8") as f:
-            f.write(*args)
+string = "Hello"
+encrypted = ""
+decrypted = ""
 
+print(f"{string=}")
 
+for s in string:
+    a = ord(s)
+    e = Enc(a, keyGen())
+    encrypted += chr(e)
 
-class Notify:
-    def __init__(self, printer: Printer) -> None:
-        self.printer = printer
+for s in encrypted:
+    d = Dec(ord(s), keyGen())
+    decrypted += chr(d)
 
-    def print_(self, *args):
-        self.printer.print_(*args)
+print(f"{encrypted=}")
+print(f"{decrypted=}")
 
-
-notify = Notify(FilePrinter(r"D:\myscript\games\cui\textbasedrpg\rpg\test.txt"))
-notify.print_("Hello")
+print(f"{string==decrypted=}")
