@@ -1,9 +1,13 @@
+import itertools
+
+
 class Key(int):
     pass
 
 
 def keyGen() -> Key:
-    return Key("01011111", 2)
+    s = "01010111"
+    return Key(s, 2)
 
 
 def Enc(m: str, key: Key) -> None:
@@ -11,7 +15,7 @@ def Enc(m: str, key: Key) -> None:
 
 
 def Dec(c: str, key: Key) -> None:
-    return int(c) ^ key
+    return Enc(c, key)
 
 string = "Hello"
 encrypted = ""
@@ -19,13 +23,14 @@ decrypted = ""
 
 print(f"{string=}")
 
+key = keyGen()
 for s in string:
     a = ord(s)
-    e = Enc(a, keyGen())
+    e = Enc(a, key)
     encrypted += chr(e)
 
 for s in encrypted:
-    d = Dec(ord(s), keyGen())
+    d = Dec(ord(s), key)
     decrypted += chr(d)
 
 print(f"{encrypted=}")
