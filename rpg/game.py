@@ -8,11 +8,11 @@ def keyGen() -> Key:
     return Key(s, 2)
 
 
-def Enc(m: str, key: Key) -> None:
+def Enc(m: str, key: Key) -> int:
     return int(m) ^ key
 
 
-def Dec(c: str, key: Key) -> None:
+def Dec(c: str, key: Key) -> int:
     return Enc(c, key)
 
 string = "Hello"
