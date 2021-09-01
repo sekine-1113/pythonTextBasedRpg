@@ -1,4 +1,6 @@
+
 class Dictable:
+
     def asdict(self):
         r = {}
         for k, v in vars(self).items():

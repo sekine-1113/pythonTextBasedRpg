@@ -1,8 +1,9 @@
 
-LIMIT_RANK = 20
 
 
 class Rank:
+
+    LIMIT_RANK = 20
 
     def __init__(self, current_point, max_point, min_point) -> None:
         self.current_point = current_point
@@ -10,7 +11,7 @@ class Rank:
         self.min_point = min_point
 
     def next_rank_point(self, curr_rank):
-        if curr_rank >= LIMIT_RANK:
+        if curr_rank >= self.LIMIT_RANK:
             return 0
         return ((curr_rank-1)**2+100)*curr_rank
 
@@ -18,10 +19,10 @@ class Rank:
         return self.next_rank_point(self.calc_rank())-self.current_point
 
     def calc_rank(self):
-        for rank in range(1, LIMIT_RANK+1):
+        for rank in range(1, self.LIMIT_RANK+1):
             if self.next_rank_point(rank) > self.current_point:
                 return rank
-        return LIMIT_RANK
+        return self.LIMIT_RANK
 
     def gain_point(self, point):
         old_rank = self.calc_rank()
