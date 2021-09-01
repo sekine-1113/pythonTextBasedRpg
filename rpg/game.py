@@ -1,10 +1,12 @@
+import secrets
+
 
 class Key(int):
     pass
 
 
-def keyGen() -> Key:
-    s = "01010111"
+def keyGen(k: int=8) -> Key:
+    s = str(bin(secrets.randbits(k)))
     return Key(s, 2)
 
 
@@ -14,6 +16,7 @@ def Enc(m: str, key: Key) -> int:
 
 def Dec(c: str, key: Key) -> int:
     return Enc(c, key)
+
 
 string = "Hello"
 encrypted = ""
