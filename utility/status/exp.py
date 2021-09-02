@@ -1,8 +1,9 @@
 
-LIMIT_LEVEL = 100
+
 
 
 class Exp:
+    LIMIT_LEVEL = 100
 
     def __init__(self, current_exp, max_exp, min_exp) -> None:
         self.current_exp = current_exp
@@ -10,7 +11,7 @@ class Exp:
         self.min_exp = min_exp
 
     def next_level_exp(self, curr_level):
-        if curr_level >= LIMIT_LEVEL:
+        if curr_level >= self.LIMIT_LEVEL:
             return 0
         return ((curr_level-1)**2+125)*curr_level
 
@@ -18,10 +19,10 @@ class Exp:
         return self.next_level_exp(self.calc_level())-self.current_exp
 
     def calc_level(self):
-        for lv in range(1, LIMIT_LEVEL+1):
+        for lv in range(1, self.LIMIT_LEVEL+1):
             if self.next_level_exp(lv) > self.current_exp:
                 return lv
-        return LIMIT_LEVEL
+        return self.LIMIT_LEVEL
 
     def gain_exp(self, exp):
         old_level = self.calc_level()
