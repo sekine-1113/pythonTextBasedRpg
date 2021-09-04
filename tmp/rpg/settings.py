@@ -1,6 +1,3 @@
-"""
-
-"""
 
 from hashlib import sha256
 from getpass import getpass
@@ -23,13 +20,6 @@ def create_ntoken(n: int=16):
     token = "".join(secrets.choice(alphabet) for _ in range(n))
     print(token)
     return token
-
-
-user = {
-    "name": "Bob",
-    "id": "",
-    "password": ""
-}
 
 
 def create_id():
@@ -57,6 +47,11 @@ def authrizer(database, user_id, user_hased_password):
 
 
 def main():
+    user = {
+        "name": "Bob",
+        "id": "",
+        "password": ""
+    }
     user_id = create_id()
     print("ID:", user_id)
     user["id"] = user_id
