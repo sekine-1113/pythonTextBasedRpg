@@ -8,6 +8,8 @@ class Role(ABC):
         self.name = ""
         self._id = -1
         self.level = level
+        if not self.can_level_up():
+            self.level = 1
         self.hitpoint = -1
         self.magicpower = -1
         self.strength = -1
@@ -21,9 +23,15 @@ class Role(ABC):
         pass
 
 
+    def can_level_up(self) -> bool:
+        if 0 < self.level < 100:
+            return True
+        return False
+
     def level_up(self):
-        self.level += 1
-        self.init()
+        if self.can_level_up():
+            self.level += 1
+            self.init()
 
 
     def show(self):
@@ -99,7 +107,7 @@ if __name__ == "__main__":
     fighter = Fighter(1)
     fighter.show()
 
-    wizard = Wizard(100)
+    wizard = Wizard(101)
     wizard.show()
 
     sage = Sage(50)
