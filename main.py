@@ -101,8 +101,6 @@ class Sage(Role):
         self.wisdom = 18 * self.level
 
 
-
-
 if __name__ == "__main__":
     fighter = Fighter(1)
     fighter.show()
