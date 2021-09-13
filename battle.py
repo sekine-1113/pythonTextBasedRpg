@@ -2,12 +2,14 @@ print("Battle")
 # a-a
 
 class DefaultClass:
-    def __init__(self) -> None:
+    def __init__(self, **obj) -> None:
         print(self.__class__.__name__)
+        self.obj = obj
 
 class ClassA:
-    def __init__(self) -> None:
+    def __init__(self, **obj) -> None:
         print(self.__class__.__name__)
+        self.obj = obj
 
 
 class_dict = {
@@ -15,6 +17,6 @@ class_dict = {
 }
 className = input("> ").lower()
 cls = class_dict.get(className, DefaultClass)
-
-cls()
+obj = {}
+cls(**obj)
 
