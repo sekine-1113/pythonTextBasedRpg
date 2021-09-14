@@ -8,9 +8,12 @@ class Poison(Debuff):
         self.damage = 5
         self.turn = 3
 
-    def effect(self):
+    def effect(self, target):
         print("毒の効果!")
-        print(self.turn)
+        if self.damage:
+            print("毒によって",self.damage, "ダメージ")
+        target.hp -= self.damage
+
         self.turn -= 1
         if self.turn == 0:
             print("毒は消えた!")
@@ -35,12 +38,13 @@ class Player:
         self.debuff = []
         self.hp = 32
 
-    def action(self):
+    def action(self, enemy: "Enemy"):
         for debuff in self.debuff:
             if debuff.turn == 0:
                 self.debuff.remove(debuff)
                 continue
-            debuff.effect()
+            debuff.effect(self)
+        enemy.hp -= 8
 
 
 class Enemy:
@@ -63,8 +67,8 @@ player.debuff.append(poison)
 turn = 0
 while True:
     turn += 1
-    print(turn, end=" ")
-    player.action()
+    print(turn, player.hp)
+    player.action(enemy)
     if enemy.hp <= 0:
         break
     player.hp -= 8
