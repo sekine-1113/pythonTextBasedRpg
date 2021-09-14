@@ -60,12 +60,14 @@ enemy = Enemy()
 poison = Poison()
 player.debuff.append(poison)
 
+turn = 0
 while True:
+    turn += 1
+    print(turn, end=" ")
     player.action()
     if enemy.hp <= 0:
         break
     player.hp -= 8
     if player.hp <= 0:
         break
-
 
