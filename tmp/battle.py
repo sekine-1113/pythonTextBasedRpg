@@ -75,3 +75,4 @@ while True:
     if player.hp <= 0:
         break
 
+# OK
