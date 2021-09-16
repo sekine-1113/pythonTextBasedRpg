@@ -12,6 +12,9 @@ class BaseCharacter(ABC):
     def action(self):
         ...
 
+    def __repr__(self) -> str:
+        return self.name
+
 
 class Player(BaseCharacter):
     def __init__(self, name: str, status: dict[str, object]) -> None:
@@ -36,4 +39,6 @@ if __name__ == "__main__":
     einfo = {"name": "Enemy", "status": {}}
     player = Player(pinfo["name"], pinfo["status"])
     enemy = Enemy(einfo["name"], einfo["status"])
-    fight(player, enemy)
+
+    print(f"{player=}")
+    print(f"{enemy=}")
