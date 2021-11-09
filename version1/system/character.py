@@ -13,6 +13,7 @@ class Job:
         self.exp = exp
         self.weaponId = weaponId
         self.accessaryId = accessaryId
+        self.status = None
 
 job_data = [
     Job("デバッグ", 0, 0, 2001, 3001),
@@ -41,7 +42,7 @@ status_data = {
 
 
 print(user.__dict__)
-user.jobId = 0
+user.jobId = 1
 print(job_data[user.jobId].__dict__)
 print(status_data[job_data[user.jobId].statusId].__dict__)
 job_data[user.jobId].statusId = user.jobId * 1000 + 2 if user.jobId != 0 else 0
