@@ -4,6 +4,3 @@ class Item:
         self.id = item_id
         self.name = name
         self.explain = explain
-
-
-
