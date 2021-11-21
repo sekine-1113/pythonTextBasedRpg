@@ -1,15 +1,19 @@
+import sys
 
-"""
-Scene
-- ゲームタイトル
-    - つよさ
-    - アイテム
-        - アイテム
-    - ガチャ
-        - ガチャ
-    - クエスト選択
-        - クエスト
-"""
+class IScene:
+    def __init__(self) -> None:
+        pass
+
+
+    def update(self):
+        print("Updated")
+
+
+class Title(IScene):
+    pass
+
+
 
 if __name__ == "__main__":
-    pass
+    scene = Title()
+    scene.update()
