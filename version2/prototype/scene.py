@@ -20,14 +20,10 @@ class Title(IScene):
         print("3. Config")
         command = int(input("> "))
         match command:
-            case 1:
-                print("Start")
-            case 2:
-                print("Exit")
-            case 3:
-                print("Config")
-            case _:
-                print("?")
+            case 1: print("Start")
+            case 2: print("Exit")
+            case 3: print("Config")
+            case _: print("?")
 
 
 
