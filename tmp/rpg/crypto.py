@@ -10,31 +10,33 @@ def keyGen(k: int=8) -> Key:
     return Key(s, 2)
 
 
-def Enc(m: str, key: Key) -> int:
-    return int(m) ^ key
-
-
-def Dec(c: str, key: Key) -> int:
-    return Enc(c, key)
-
-
 string = "Hello"
-encrypted = ""
-decrypted = ""
 
 print(f"{string=}")
 
 key = keyGen()
-for s in string:
-    a = ord(s)
-    e = Enc(a, key)
-    encrypted += chr(e)
 
-for s in encrypted:
-    d = Dec(ord(s), key)
-    decrypted += chr(d)
+def crypt(key):
+    def Enc(m: str, key: Key) -> int:
+        return int(m) ^ key
+    encrypted = ""
+    for s in string:
+        a = ord(s)
+        e = Enc(a, key)
+        encrypted += chr(e)
+    return encrypted
 
-print(f"{encrypted=}")
-print(f"{decrypted=}")
+def decrypt(key, encrypt):
+    def Dec(m: str, key: Key) -> int:
+        return int(m) ^ key
+    decrypted = ""
+    for s in encrypt:
+        d = Dec(ord(s), key)
+        decrypted += chr(d)
+    return decrypted
+
+crypted = crypt(key)
+decrypted = decrypt(key, crypted)
+print(f"{crypted=}\n{decrypted=}")
 
 print(f"{string==decrypted=}")

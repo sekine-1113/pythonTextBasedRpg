@@ -64,4 +64,4 @@ def main():
         print("Invalid")
 
 
-create_ntoken(16)
+main()

@@ -116,5 +116,9 @@ while mainloop:
 print("Thank you for playing. See you.")
 if not DEBUG:
     input()
+del mainloop, battleloop
+del command, battle_command
+del player, enemy
+del DEBUG,PROMPT
 exit()
 # ============================================================================

@@ -47,6 +47,7 @@ def TestMyClass():
     mycls.method = Inner().method
     assert mycls["method"]() == mycls.method()
     print("OK")
+    del mycls
 
 if __name__ == "__main__":
     TestMyClass()
