@@ -6,13 +6,13 @@ def read_json(fp: str) -> dict:
         return json.load(f)
 
 
-def yes_or_no(text: str="") -> None:
+def yes_or_no(text: str="") -> bool|None:
     yes = ("yes", "y")
     no = ("no", "n")
     user_input = input(text).lower()
     if user_input in yes:
-        print("Yes")
+        return True
     elif user_input in no:
-        print("No")
+        return False
     else:
-        print("Yes or No")
+        return

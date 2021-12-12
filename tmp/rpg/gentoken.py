@@ -37,6 +37,12 @@ def create_password():
     return user_password.hexdigest()
 
 
+def confirm_password():
+    password = getpass()
+    user_password = sha256(password.encode())
+    return user_password.hexdigest()
+
+
 def authrizer(database, user_id, user_hased_password):
     valid = True
     if database["id"] != user_id:
@@ -57,7 +63,7 @@ def main():
     user["id"] = user_id
     user_pass = create_password()
     user["password"] = user_pass
-
+    user_pass = confirm_password()
     if authrizer(user, user_id, user_pass):
         print("Login!")
     else:
