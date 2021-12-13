@@ -2,25 +2,28 @@ import random
 
 from copy import deepcopy
 from enum import Enum, auto
-from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING, StreamHandler, getLogger
-
-from argparser import args
 
 
-levels = {
-    "debug": DEBUG,
-    "info": INFO,
-    "warning": WARNING,
-    "error": ERROR,
-    "critical": CRITICAL
-}
-level = DEBUG
-for key, value in args._get_kwargs():
-    if value:
-        level = levels.get(key)
-logger = getLogger(__name__)
-logger.setLevel(level)
-logger.addHandler(StreamHandler())
+def set_logger():
+    from logging import (
+        CRITICAL, DEBUG, ERROR, INFO, WARNING, StreamHandler, getLogger)
+    from argparser import args
+
+    levels = {
+        "debug": DEBUG,
+        "info": INFO,
+        "warning": WARNING,
+        "error": ERROR,
+        "critical": CRITICAL
+    }
+    level = DEBUG
+    for key, value in args._get_kwargs():
+        if value:
+            level = levels.get(key)
+    logger = getLogger(__name__)
+    logger.setLevel(level)
+    logger.addHandler(StreamHandler())
+    return logger
 
 
 class Quest:
@@ -59,18 +62,18 @@ class Ability:
         self._type = 0
         self.turn = turn
 
-    def execute(self):
+    def execute(self, source: "Actor", target: "Actor"):
         pass
 
     def get_ability_info(self, player=1):
         pass
 
     def get_type(self):
-        return
+        pass
 
 
 class AttackAbility(Ability):
-    def execute(self, source: "Player", target: "Player"):
+    def execute(self, source: "Actor", target: "Actor"):
         damage = source.job_class.status.strength * self.p
         damage = int(damage)
         target.job_class.status.hitpoint -= damage
@@ -87,10 +90,10 @@ class AttackAbility(Ability):
 
 
 class HealAbility(Ability):
-    def execute(self, source: "Player", target: "Player"):
+    def execute(self, source: "Actor", target: "Actor"):
         heal = source.job_class.status.hitpoint // self.p
         heal = int(heal)
-        if target.job_class.status.max_hitpoint > target.job_class.status.hitpoint + heal:
+        if target.job_class.status.max_hitpoint > (target.job_class.status.hitpoint + heal):
             target.job_class.status.hitpoint += heal
         else:
             heal = target.job_class.status.max_hitpoint - target.job_class.status.hitpoint
@@ -120,8 +123,7 @@ class DebuffAbility(Ability):
             raise StopIteration()
         self.turn -= 1
 
-    def execute(self, source: "Player", target: "Player"):
-        print(f"+{self}")
+    def execute(self, source: "Actor", target: "Actor"):
         old = target.job_class.status.strength
         target.job_class.status.strength *= self.p
         target.job_class.status.strength = int(target.job_class.status.strength)
@@ -145,37 +147,22 @@ class DebuffAbility(Ability):
 
 
 class JobClass:
-    def __init__(self, name, status: Status, abilities: list[Ability]) -> None:
+    def __init__(self, name, status: Status,
+                    abilities: list[Ability]) -> None:
         self.name = name
         self.status = status
         self.abilities = abilities
 
 
-class Player:
+class Actor:
     def __init__(self, name, money, job_class: JobClass) -> None:
         self.name = name
         self.money = money
+        self.exp = 0
         self.job_class: JobClass = job_class
 
-    def choose_ability(self, player=1):
-        if player:
-            for i, ability in enumerate(self.job_class.abilities):
-                print(i, ability.name)
-            return int(input("> "))
-
-        abilitys = []
-        rates = []
-        for ability in self.job_class.abilities:
-            abilitys.append(ability)
-            ability_type = ability.get_type()
-            if ability_type == 1:
-                rate = 1-(self.job_class.status.hitpoint / self.job_class.status.max_hitpoint)*(1/ability.p)
-                if rate <= 0:
-                    rate = random.random()
-            else:
-                rate = random.uniform(abs(1/ability.p-0.5), 1)
-            rates.append(rate)
-        return self.job_class.abilities.index(random.choices(self.job_class.abilities, rates)[0])
+    def choose_ability(self):
+        ...
 
     def exec_ability(self, idx, source, target):
         if isinstance(idx, str):
@@ -185,20 +172,8 @@ class Player:
                 raise ValueError
         return self.job_class.abilities[idx].execute(source, target)
 
-    def message(self, _type, player=1):
-        if player:
-            msgs = {
-                AbilityType.Attack: "{}に{}ダメージをあたえた!",
-                AbilityType.Heal: "{}はHP{}回復した!",
-                AbilityType.Debuff: "{}に{}の効果!"
-            }
-        else:
-            msgs = {
-                AbilityType.Attack: "{}は{}のダメージをうけた!",
-                AbilityType.Heal:" {}はHP{}回復した!",
-                AbilityType.Debuff: "{}は攻撃力が{}になった!"
-            }
-        return msgs.get(_type)
+    def message(self, _type):
+        ...
 
     def turn(self):
         debuff: DebuffAbility
@@ -210,29 +185,84 @@ class Player:
             except StopIteration:
                 print(f"-{debuff}")
                 _new = int(self.job_class.status.strength/debuff.p)
-                del self.job_class.status.debuff[self.job_class.status.debuff.index(debuff)]
+                del self.job_class.status.debuff[
+                    self.job_class.status.debuff.index(debuff)]
                 self.job_class.status.reset(_new)
 
 
-def battle(player: Player, enemy: Player):
-    # logger.debug(f"[Start] battle({player.name}, {enemy.name})")
+class Player(Actor):
+    def __init__(self, name, money, job_class: JobClass) -> None:
+        super().__init__(name, money, job_class)
+
+    def choose_ability(self,):
+        for i, ability in enumerate(self.job_class.abilities):
+            print(i, ability.name)
+        return int(input("> "))
+
+    def message(self, _type):
+        msgs = {
+            AbilityType.Attack: "{}に{}ダメージをあたえた!",
+            AbilityType.Heal: "{}はHP{}回復した!",
+            AbilityType.Debuff: "{}に{}の効果!"
+        }
+        return msgs.get(_type)
+
+
+class Enemy(Actor):
+    def __init__(self, name, money, job_class: JobClass) -> None:
+        super().__init__(name, money, job_class)
+        self.exp = 30
+
+    def choose_ability(self):
+        abilitys = []
+        rates = []
+        for ability in self.job_class.abilities:
+            abilitys.append(ability)
+            ability_type = ability.get_type()
+            if ability_type == 1:
+                rate = 1-(self.job_class.status.hitpoint \
+                        / self.job_class.status.max_hitpoint) \
+                        * (1/ability.p)
+                if rate < 0:
+                    rate = random.random()
+                elif rate == 0:
+                    rate = 1/100
+            else:
+                rate = random.uniform(abs(1/ability.p-0.5), 1)
+            rates.append(rate)
+        return self.job_class.abilities.index(
+                    random.choices(self.job_class.abilities, rates)[0])
+
+    def message(self, _type):
+        msgs = {
+            AbilityType.Attack: "{}は{}のダメージをうけた!",
+            AbilityType.Heal: "{}はHP{}回復した!",
+            AbilityType.Debuff: "{}は攻撃力が{}になった!"
+        }
+        return msgs.get(_type)
+
+
+def battle(player: Actor, enemy: Actor):
     turn = 0
     print(f"{enemy.name}が現れた!")
-    actor = [player, enemy]
+
+    actors = [player, enemy]
     while True:
         turn += 1
-        print(f"{turn}: {player.name}のターン! HP:{player.job_class.status.hitpoint}/STR:{player.job_class.status.strength}")
+        print(f"{turn}: {player.name}({player.job_class.name})のターン! ")
+        print(f"HP:{player.job_class.status.hitpoint}/STR:{player.job_class.status.strength}")
         print(f"DEBUFF:{player.job_class.status.debuff}")
         ability_idx = player.choose_ability()
         ability: Ability = player.job_class.abilities[ability_idx]
         sidx, tidx = ability.get_ability_info()
-
         print(f"{player.name}の{ability.name}!")
         ability_type = ability.get_type()
         msg = player.message(ability_type)
 
-        d = player.exec_ability(ability_idx, actor[sidx], actor[tidx])
+        d = player.exec_ability(ability_idx, actors[sidx], actors[tidx])
         match ability_type:
+            case AbilityType.Attack:
+                print(msg.format(enemy.name, d))
             case AbilityType.Heal:
                 if d == 0:
                     print("HPが満タンだ!")
@@ -242,7 +272,7 @@ def battle(player: Player, enemy: Player):
             case AbilityType.Debuff:
                 print(msg.format(enemy.name, ability.name))
             case _:
-                print(msg.format(enemy.name, d))
+                pass
         if enemy.job_class.status.hitpoint <= 0:
             print(f"{enemy.name}をたおした!")
             # logger.debug(f"[Finish] battle({player.name}, {enemy.name}) -> 1")
@@ -250,29 +280,31 @@ def battle(player: Player, enemy: Player):
         player.turn()
         print(f"{enemy.name}(HP:{enemy.job_class.status.hitpoint})のターン!")
         print(f"DEBUFF:{enemy.job_class.status.debuff}")
-        enemy_ability_idx = enemy.choose_ability(0)
+        enemy_ability_idx = enemy.choose_ability()
         enemy_ability: Ability = enemy.job_class.abilities[enemy_ability_idx]
         enemy_ability_type = enemy_ability.get_type()
         sidx, tidx = enemy_ability.get_ability_info(0)
-        enemy_msg = enemy.message(enemy_ability_type, 0)
-
+        enemy_msg = enemy.message(enemy_ability_type)
         print(f"{enemy.name}の{enemy_ability.name}")
-        d = enemy.exec_ability(enemy_ability_idx, actor[sidx], actor[tidx])
+        d = enemy.exec_ability(enemy_ability_idx, actors[sidx], actors[tidx])
         match enemy_ability_type:
             case AbilityType.Heal:
                 print(enemy_msg.format(enemy.name, d))
             case AbilityType.Attack:
                 print(enemy_msg.format(player.name, d))
+            case AbilityType.Debuff:
+                print(enemy_msg.format(player.name, d))
+            case _:
+                pass
         if player.job_class.status.hitpoint <= 0:
             print(f"{player.name}はたおされた!")
-            # logger.debug(f"[Finish] battle({player.name}, {enemy.name}) -> -1")
             return -1
         enemy.turn()
 
 
 def game(player: Player):
 
-    slime = Player(
+    slime = Enemy(
         "スライム",
         Money(300),
         JobClass(
@@ -281,7 +313,7 @@ def game(player: Player):
             [AttackAbility("攻撃")]
         )
     )
-    dragon = Player(
+    dragon = Enemy(
         "ドラゴン",
         Money(1000),
         JobClass(
@@ -290,7 +322,7 @@ def game(player: Player):
             [AttackAbility("攻撃"), AttackAbility("3倍攻撃", 3), HealAbility("回復")]
         )
     )
-    debug_enemy = Player(
+    debug_enemy = Enemy(
         "デバッグくん",
         Money(10**10-1),
         JobClass(
@@ -320,6 +352,8 @@ def game(player: Player):
     winner = battle(deepcopy(player), deepcopy(enemy))
     if winner == 1:
         print("You Win!")
+        print(f"{enemy.exp}EXPをかくとく!")
+        player.exp += enemy.exp
         print(f"{enemy.money}Gをかくとく!")
         player.money += enemy.money
         print(f"{player.money-enemy.money}G->{player.money}G")
@@ -330,6 +364,7 @@ def game(player: Player):
 
 if __name__ == "__main__":
     # name = input("Enter your name:")
+
     name = "アリス"
     player = Player(
         name,

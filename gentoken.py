@@ -1,9 +1,10 @@
 
-from hashlib import sha256
-from getpass import getpass
 import random
-import string
 import secrets
+import string
+
+from getpass import getpass
+from hashlib import sha256
 
 
 def create_ntoken(n: int=16):
@@ -16,9 +17,9 @@ def create_ntoken(n: int=16):
 
         ex. "WdbIiZRF7uC3eSJj"
     """
-    alphabet = string.ascii_letters + string.digits
-    token = "".join(secrets.choice(alphabet) for _ in range(n))
-    print(token)
+    alnum = string.ascii_letters + string.digits
+    token = "".join(secrets.choice(alnum) for _ in range(n))
+    del alnum
     return token
 
 
@@ -26,20 +27,23 @@ def create_id():
     k1 = "".join(random.choices(string.ascii_uppercase, k=2))
     k2 = "".join(random.choices(string.digits, k=4))
     user_id = k1 + k2
+    del k1, k2
     return user_id
 
 
-def create_password():
+def create_password(n: int=4):
     password = ""
-    while len(password) < 4:
+    while len(password) < n:
         password = getpass()
     user_password = sha256(password.encode())
+    del password
     return user_password.hexdigest()
 
 
 def confirm_password():
-    password = getpass()
+    password = getpass("Confirm Password:")
     user_password = sha256(password.encode())
+    del password
     return user_password.hexdigest()
 
 
@@ -53,6 +57,7 @@ def authrizer(database, user_id, user_hased_password):
 
 
 def main():
+    create_ntoken()
     user = {
         "name": "Bob",
         "id": "",
