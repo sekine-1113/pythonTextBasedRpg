@@ -1,7 +1,7 @@
-import random
-
 from copy import deepcopy
-from enum import Enum, auto
+
+from version4.actor import Actor, Player, Enemy
+from version4.ability import AbilityType, Ability, AttackAbility, HealAbility, DebuffAbility
 
 
 def set_logger():
@@ -49,197 +49,12 @@ class Status:
         self.strength = new_
 
 
-class AbilityType(Enum):
-    Attack = auto()
-    Heal = auto()
-    Debuff = auto()
-
-
-class Ability:
-    def __init__(self, name, p=1, turn=0) -> None:
-        self.name = name
-        self.p = p
-        self._type = 0
-        self.turn = turn
-
-    def execute(self, source: "Actor", target: "Actor"):
-        pass
-
-    def get_ability_info(self, player=1):
-        pass
-
-    def get_type(self):
-        pass
-
-
-class AttackAbility(Ability):
-    def execute(self, source: "Actor", target: "Actor"):
-        damage = source.job_class.status.strength * self.p
-        damage = int(damage)
-        target.job_class.status.hitpoint -= damage
-        return damage
-
-    def get_ability_info(self, player=1):
-        if player:
-            return [0, 1]
-        else:
-            return [1, 0]
-
-    def get_type(self):
-        return AbilityType.Attack
-
-
-class HealAbility(Ability):
-    def execute(self, source: "Actor", target: "Actor"):
-        heal = source.job_class.status.hitpoint // self.p
-        heal = int(heal)
-        if target.job_class.status.max_hitpoint > (target.job_class.status.hitpoint + heal):
-            target.job_class.status.hitpoint += heal
-        else:
-            heal = target.job_class.status.max_hitpoint - target.job_class.status.hitpoint
-            target.job_class.status.hitpoint = target.job_class.status.max_hitpoint
-        return heal
-
-    def get_type(self):
-        return AbilityType.Heal
-
-    def get_ability_info(self, player=1):
-        if player:
-            return [0, 0]
-        else:
-            return [1, 1]
-
-
-class DebuffAbility(Ability):
-    def __init__(self, name, p=1, turn=0) -> None:
-        super().__init__(name, p=p, turn=turn)
-        self.eturn = turn  # effective turn
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.turn <= 1:
-            raise StopIteration()
-        self.turn -= 1
-
-    def execute(self, source: "Actor", target: "Actor"):
-        old = target.job_class.status.strength
-        target.job_class.status.strength *= self.p
-        target.job_class.status.strength = int(target.job_class.status.strength)
-        print(f"{old}->{target.job_class.status.strength}")
-        target.job_class.status.debuff.append(
-            DebuffAbility(self.name, self.p, self.eturn)
-        )
-        return int(target.job_class.status.strength)
-
-    def get_type(self):
-        return AbilityType.Debuff
-
-    def get_ability_info(self, player=1):
-        if player:
-            return [1, 1]
-        else:
-            return [0, 0]
-
-    def __repr__(self) -> str:
-        return f"{self.name} @{self.turn}"
-
-
 class JobClass:
     def __init__(self, name, status: Status,
                     abilities: list[Ability]) -> None:
         self.name = name
         self.status = status
         self.abilities = abilities
-
-
-class Actor:
-    def __init__(self, name, money, job_class: JobClass) -> None:
-        self.name = name
-        self.money = money
-        self.exp = 0
-        self.job_class: JobClass = job_class
-
-    def choose_ability(self):
-        ...
-
-    def exec_ability(self, idx, source, target):
-        if isinstance(idx, str):
-            if idx.isdigit:
-                idx = int(idx)
-            else:
-                raise ValueError
-        return self.job_class.abilities[idx].execute(source, target)
-
-    def message(self, _type):
-        ...
-
-    def turn(self):
-        debuff: DebuffAbility
-        debuffs = list()
-        debuffs.extend(self.job_class.status.debuff)
-        for debuff in debuffs:
-            try:
-                next(debuff)
-            except StopIteration:
-                print(f"-{debuff}")
-                _new = int(self.job_class.status.strength/debuff.p)
-                del self.job_class.status.debuff[
-                    self.job_class.status.debuff.index(debuff)]
-                self.job_class.status.reset(_new)
-
-
-class Player(Actor):
-    def __init__(self, name, money, job_class: JobClass) -> None:
-        super().__init__(name, money, job_class)
-
-    def choose_ability(self,):
-        for i, ability in enumerate(self.job_class.abilities):
-            print(i, ability.name)
-        return int(input("> "))
-
-    def message(self, _type):
-        msgs = {
-            AbilityType.Attack: "{}に{}ダメージをあたえた!",
-            AbilityType.Heal: "{}はHP{}回復した!",
-            AbilityType.Debuff: "{}に{}の効果!"
-        }
-        return msgs.get(_type)
-
-
-class Enemy(Actor):
-    def __init__(self, name, money, job_class: JobClass) -> None:
-        super().__init__(name, money, job_class)
-        self.exp = 30
-
-    def choose_ability(self):
-        abilitys = []
-        rates = []
-        for ability in self.job_class.abilities:
-            abilitys.append(ability)
-            ability_type = ability.get_type()
-            if ability_type == 1:
-                rate = 1-(self.job_class.status.hitpoint \
-                        / self.job_class.status.max_hitpoint) \
-                        * (1/ability.p)
-                if rate < 0:
-                    rate = random.random()
-                elif rate == 0:
-                    rate = 1/100
-            else:
-                rate = random.uniform(abs(1/ability.p-0.5), 1)
-            rates.append(rate)
-        return self.job_class.abilities.index(
-                    random.choices(self.job_class.abilities, rates)[0])
-
-    def message(self, _type):
-        msgs = {
-            AbilityType.Attack: "{}は{}のダメージをうけた!",
-            AbilityType.Heal: "{}はHP{}回復した!",
-            AbilityType.Debuff: "{}は攻撃力が{}になった!"
-        }
-        return msgs.get(_type)
 
 
 def battle(player: Actor, enemy: Actor):
