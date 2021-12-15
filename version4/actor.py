@@ -58,9 +58,9 @@ class Player(Actor):
 
     def message(self, _type: AbilityType):
         msgs = {
-            AbilityType.Attack: "{}に{}ダメージをあたえた!",
-            AbilityType.Heal: "{}はHP{}回復した!",
-            AbilityType.Debuff: "{}に{}の効果!"
+            AbilityType.ATTACK: "{}に{}ダメージをあたえた!",
+            AbilityType.HEAL: "{}はHP{}回復した!",
+            AbilityType.DEBUFF: "{}に{}の効果!"
         }
         return msgs.get(_type)
 
@@ -92,8 +92,8 @@ class Enemy(Actor):
 
     def message(self, _type):
         msgs = {
-            AbilityType.Attack: "{}は{}のダメージをうけた!",
-            AbilityType.Heal: "{}はHP{}回復した!",
-            AbilityType.Debuff: "{}は攻撃力が{}になった!"
+            AbilityType.ATTACK: "{}は{}のダメージをうけた!",
+            AbilityType.HEAL: "{}はHP{}回復した!",
+            AbilityType.DEBUFF: "{}は攻撃力が{}になった!"
         }
         return msgs.get(_type)

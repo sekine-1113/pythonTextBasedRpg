@@ -4,7 +4,7 @@ from version4.actor import Actor, Player, Enemy
 from version4.ability import AbilityType, Ability, AttackAbility, HealAbility, DebuffAbility
 
 
-def set_logger():
+def set_logger(logger_name=None):
     from logging import (
         CRITICAL, DEBUG, ERROR, INFO, WARNING, StreamHandler, getLogger)
     from argparser import args
@@ -20,7 +20,9 @@ def set_logger():
     for key, value in args._get_kwargs():
         if value:
             level = levels.get(key)
-    logger = getLogger(__name__)
+    if logger_name is None:
+        logger_name = __name__
+    logger = getLogger(logger_name)
     logger.setLevel(level)
     logger.addHandler(StreamHandler())
     return logger
@@ -76,15 +78,15 @@ def battle(player: Actor, enemy: Actor):
 
         d = player.exec_ability(ability_idx, actors[sidx], actors[tidx])
         match ability_type:
-            case AbilityType.Attack:
+            case AbilityType.ATTACK:
                 print(msg.format(enemy.name, d))
-            case AbilityType.Heal:
+            case AbilityType.HEAL:
                 if d == 0:
                     print("HPが満タンだ!")
                 else:
                     print(msg.format(player.name, d))
                     print(f"HP:{player.job_class.status.hitpoint-d}->HP:{player.job_class.status.hitpoint}")
-            case AbilityType.Debuff:
+            case AbilityType.DEBUFF:
                 print(msg.format(enemy.name, ability.name))
             case _:
                 pass
@@ -103,11 +105,11 @@ def battle(player: Actor, enemy: Actor):
         print(f"{enemy.name}の{enemy_ability.name}")
         d = enemy.exec_ability(enemy_ability_idx, actors[sidx], actors[tidx])
         match enemy_ability_type:
-            case AbilityType.Heal:
-                print(enemy_msg.format(enemy.name, d))
-            case AbilityType.Attack:
+            case AbilityType.ATTACK:
                 print(enemy_msg.format(player.name, d))
-            case AbilityType.Debuff:
+            case AbilityType.HEAL:
+                print(enemy_msg.format(enemy.name, d))
+            case AbilityType.DEBUFF:
                 print(enemy_msg.format(player.name, d))
             case _:
                 pass
@@ -117,7 +119,7 @@ def battle(player: Actor, enemy: Actor):
         enemy.turn()
 
 
-def game(player: Player):
+def select_quest(player: Player):
 
     slime = Enemy(
         "スライム",
@@ -192,7 +194,7 @@ if __name__ == "__main__":
     )
 
     while True:
-        game(player)
+        select_quest(player)
         y = input("Continue? > ")
         if y not in ("y", "Y", "YES", "yes", "Yes"):
             break

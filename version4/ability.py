@@ -10,9 +10,9 @@ if TYPE_CHECKING:
 
 
 class AbilityType(Enum):
-    Attack = auto()
-    Heal = auto()
-    Debuff = auto()
+    ATTACK = auto()
+    HEAL = auto()
+    DEBUFF = auto()
 
 
 class Ability:
@@ -46,7 +46,7 @@ class AttackAbility(Ability):
             return [1, 0]
 
     def get_type(self):
-        return AbilityType.Attack
+        return AbilityType.ATTACK
 
 
 class HealAbility(Ability):
@@ -61,7 +61,7 @@ class HealAbility(Ability):
         return heal
 
     def get_type(self):
-        return AbilityType.Heal
+        return AbilityType.HEAL
 
     def get_ability_info(self, player=1):
         if player:
@@ -94,7 +94,7 @@ class DebuffAbility(Ability):
         return int(target.job_class.status.strength)
 
     def get_type(self):
-        return AbilityType.Debuff
+        return AbilityType.DEBUFF
 
     def get_ability_info(self, player=1):
         if player:
