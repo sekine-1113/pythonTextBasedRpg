@@ -7,7 +7,7 @@ from version4.ability import AbilityType, Ability, AttackAbility, HealAbility, D
 def set_logger(logger_name=None):
     from logging import (
         CRITICAL, DEBUG, ERROR, INFO, WARNING, StreamHandler, getLogger)
-    from argparser import args
+    from .argparser import args
 
     levels = {
         "debug": DEBUG,

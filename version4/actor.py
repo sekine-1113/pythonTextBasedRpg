@@ -11,6 +11,7 @@ import version4.ability
 
 AbilityType = version4.ability.AbilityType
 
+
 class Actor:
     def __init__(self, name, money, job_class: JobClass) -> None:
         self.name = name
