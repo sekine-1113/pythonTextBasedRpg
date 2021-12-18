@@ -180,6 +180,7 @@ def select_quest(player: Player):
 
 
 if __name__ == "__main__":
+    # いつかつくる
     # name = input("Enter your name:")
 
     name = "アリス"
