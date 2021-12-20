@@ -190,7 +190,12 @@ if __name__ == "__main__":
         JobClass(
             "勇者",
             Status(2000, 800),
-            [HealAbility("回復"), AttackAbility("攻撃"), AttackAbility("2倍攻撃", 2), DebuffAbility("攻撃力大ダウン", 0.5, 3)]
+            [
+                HealAbility("回復"),
+                AttackAbility("攻撃"),
+                AttackAbility("2倍攻撃", 2),
+                DebuffAbility("攻撃力大ダウン", 0.5, 3)
+            ]
         )
     )
 

@@ -77,7 +77,7 @@ class Enemy(Actor):
         for ability in self.job_class.abilities:
             abilitys.append(ability)
             ability_type = ability.get_type()
-            if ability_type == 1:
+            if ability_type == AbilityType.HEAL:
                 rate = 1-(self.job_class.status.hitpoint \
                         / self.job_class.status.max_hitpoint) \
                         * (1/ability.p)

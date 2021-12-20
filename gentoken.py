@@ -40,6 +40,14 @@ def create_password(n: int=4):
     return user_password.hexdigest()
 
 
+def create_random_password(n: int=16):
+    alnum = string.ascii_letters + string.digits
+    password = "".join(secrets.choice(alnum) for _ in range(n))
+    row_password = password
+    password = sha256(password.encode())
+    return row_password, password.hexdigest()
+
+
 def confirm_password():
     password = getpass("Confirm Password:")
     user_password = sha256(password.encode())
@@ -57,7 +65,8 @@ def authrizer(database, user_id, user_hased_password):
 
 
 def main():
-    create_ntoken()
+    print(create_ntoken())
+    print(create_random_password())
     user = {
         "name": "Bob",
         "id": "",
@@ -75,4 +84,5 @@ def main():
         print("Invalid")
 
 
-main()
+if __name__ == "__main__":
+    main()
