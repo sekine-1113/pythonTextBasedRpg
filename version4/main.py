@@ -108,7 +108,10 @@ def battle(player: Actor, enemy: Actor):
             case AbilityType.ATTACK:
                 print(enemy_msg.format(player.name, d))
             case AbilityType.HEAL:
-                print(enemy_msg.format(enemy.name, d))
+                if d == 0:
+                    print("HPが満タンだった!")
+                else:
+                    print(enemy_msg.format(enemy.name, d))
             case AbilityType.DEBUFF:
                 print(enemy_msg.format(player.name, d))
             case _:
@@ -181,9 +184,9 @@ def select_quest(player: Player):
 
 if __name__ == "__main__":
     # いつかつくる
-    # name = input("Enter your name:")
+    name = input("Enter your name:")
 
-    name = "アリス"
+    # name = "アリス"
     player = Player(
         name,
         Money(0),
@@ -201,7 +204,7 @@ if __name__ == "__main__":
 
     while True:
         select_quest(player)
-        y = input("Continue? > ")
+        y = input("Continue?(y/n) > ")
         if y not in ("y", "Y", "YES", "yes", "Yes"):
             break
     input("Please Press Any Key...")

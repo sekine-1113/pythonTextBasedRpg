@@ -84,7 +84,9 @@ class Enemy(Actor):
                 if rate < 0:
                     rate = random.random()
                 elif rate == 0:
-                    rate = 1/100
+                    rate = random.random()
+                    if rate > 0.5:
+                        rate -= 0.5
             else:
                 rate = random.uniform(abs(1/ability.p-0.5), 1)
             rates.append(rate)

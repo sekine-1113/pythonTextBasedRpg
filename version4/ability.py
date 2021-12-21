@@ -79,7 +79,7 @@ class DebuffAbility(Ability):
         return self
 
     def __next__(self):
-        if self.turn <= 1:
+        if self.turn < 1:
             raise StopIteration()
         self.turn -= 1
 
