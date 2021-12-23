@@ -2,9 +2,6 @@ from __future__ import annotations
 from enum import Enum, auto
 from typing import TYPE_CHECKING
 
-
-
-
 if TYPE_CHECKING:
     from version4.actor import Actor
 
@@ -103,4 +100,7 @@ class DebuffAbility(Ability):
             return [0, 0]
 
     def __repr__(self) -> str:
-        return f"{self.name} @{self.turn}"
+        if self.turn:
+            return f"{self.name} @{self.turn}"
+        else:
+            return f"{self.name}"
