@@ -1,6 +1,6 @@
 import sqlite3
 
-from constant import DATABASE_FILE_PATH
+from settings import DATABASE_FILE_PATH
 
 
 
@@ -41,8 +41,9 @@ def main():
     cur.execute(insert_table("classes_status", "(1, 30, 1)"))
     cur.execute(insert_table("classes_status", "(2, 100, 2)"))
     cur.execute(insert_table("classes_status", "(3, 200, 3)"))
-    cur.execute(insert_table("classes_status", "(4, 300, 4)"))
-    cur.execute("UPDATE classes_status SET exp=350 WHERE id=4")
+    cur.execute(insert_table("classes_status", "(4, 350, 4)"))
+    if cur.execute(select_table("classes_status", where="id=4")).fetchone():
+        cur.execute("UPDATE classes_status SET exp=300 WHERE id=4")
     plevel = cur.execute(select_table("classes_status", "MAX(level)", where=f"exp<={pexp}")).fetchone()[0]
     print(f"{plevel=}")
 

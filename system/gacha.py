@@ -1,9 +1,9 @@
 import sqlite3
 import random
 
-
 from enum import IntEnum
 from pprint import pprint
+
 
 class Rarerity(IntEnum):
     N = 0
