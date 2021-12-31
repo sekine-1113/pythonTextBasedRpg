@@ -63,6 +63,9 @@ class PlayerDataBase:
         self.count = self.count_regist()
         self.cur.execute("INSERT INTO player_status VALUES (?, ?, ?, ?)", (self.count, 0, 1, 0))
 
+    def is_regist(self, idx):
+        return self.cur.execute("SELECT COUNT(*) FROM player_master WHERE id={}".format(idx)).fetchone()[0] == 1
+
     def count_regist(self) -> bool:
         return self.cur.execute("SELECT COUNT(*) FROM player_master").fetchone()[0]
 
@@ -71,32 +74,64 @@ class PlayerDataBase:
             self.regist()
         return self.select()
 
+
+
 class Player:
-    def __init__(self, cur, idx=1) -> None:
+    def __init__(self, cur, idx) -> None:
         self.cur = cur
         self.idx = idx
+
+    def get_player(self):
+        idx, name = self.cur.execute("SELECT id, name FROM player_master WHERE id={}".format(self.idx)).fetchone()
+        return idx, name
 
     def get_status(self):
         money, class_id, rank_exp = self.cur.execute("SELECT money, class_id, rank_exp FROM player_status WHERE id={}".format(self.idx)).fetchall()[0]
         return money, class_id, rank_exp
 
+    def get_rank_exp(self):
+        rank_exp = self.cur.execute("SELECT rank_exp FROM player_status WHERE id={}".format(self.idx)).fetchone()[0]
+        return rank_exp
 
-once = RPG_CALL_ONCE(":memory:")
+    def get_rank_sql(self):
+        return self.cur.execute(
+            """
+            SELECT MAX(rank_id) FROM rank_master JOIN player_status
+            WHERE (player_status.rank_exp >= rank_master.rank_exp)
+            AND player_status.id={}""".format(self.idx)).fetchone()[0]
 
-cur = once.get_cursor()
-player_db = PlayerDataBase(cur)
+    def set_rank_sql(self, exp=0):
+        rank_exp = int(self.get_rank_exp()) + exp
+        self.cur.execute("UPDATE player_status SET rank_exp={} WHERE id={}".format(rank_exp, self.idx))
 
-player_idx, player_name = player_db.start()
-player = Player(cur)
-player.get_status()
 
-player_rank = player.status.get_rank_sql(cur)
+class PlayerFactory:
+    def __init__(self, cur, player_database: PlayerDataBase) -> None:
+        self.cur = cur
+        self.player_database = player_database(self.cur)
 
-idx, name = player.get_player(cur)
-print(f"{idx=} {name=} {player_rank=}")
+    def create(self, idx):
+        if self.check(idx):
+            return Player(cur, idx)
+        self.player_database.regist()
+        return Player(cur, idx)
 
-player.status.add_rank_exp(1000)
-player.status.set_rank_sql(cur)
-idx, name = player.get_player(cur)
-player_rank = player.status.get_rank_sql(cur)
-print(f"{idx=} {name=} {player_rank=}")
+    def check(self, idx):
+        return self.player_database.is_regist(idx)
+
+
+def show_player(player):
+    idx, name = player.get_player()
+    player_rank = player.get_rank_sql()
+    print(f"{idx=} {name=} {player_rank=}")
+
+
+once = RPG_CALL_ONCE(":memory:")  # 初期化及びデータベースの構築
+cur = once.get_cursor()  # データベースオブジェクトの取得
+player_factory = PlayerFactory(cur, PlayerDataBase)  # プレイヤーオブジェクトのファクトリークラス
+player = player_factory.create(1)  # プレイヤーオブジェクトを生成
+player2 = player_factory.create(2)  # プレイヤーオブジェクトを生成
+show_player(player)
+player.set_rank_sql(1000)  # ランクEXPに加算
+show_player(player)
+show_player(player2)
