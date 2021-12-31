@@ -7,7 +7,7 @@ from version4.ability import AbilityType, Ability, AttackAbility, HealAbility, D
 def set_logger(logger_name=None):
     from logging import (
         CRITICAL, DEBUG, ERROR, INFO, WARNING, StreamHandler, getLogger)
-    from .argparser import args
+    from version4.argparser import args
 
     levels = {
         "debug": DEBUG,
@@ -18,6 +18,8 @@ def set_logger(logger_name=None):
     }
     level = DEBUG
     for key, value in args._get_kwargs():
+        if key not in levels.keys():
+            continue
         if value:
             level = levels.get(key)
     if logger_name is None:
@@ -26,7 +28,6 @@ def set_logger(logger_name=None):
     logger.setLevel(level)
     logger.addHandler(StreamHandler())
     return logger
-
 
 class Quest:
     def __init__(self, name, enemyIdx) -> None:

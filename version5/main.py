@@ -1,78 +1,102 @@
 import os
 import sqlite3
+from sqlite3.dbapi2 import Cursor
 
 from settings import DATABASE_DIR_PATH
+from player import PlayerFactory
 
 
-def create_dirs():
-    if not os.path.exists(DATABASE_DIR_PATH):
-        print("NOT EXISTS")
-        os.mkdir(DATABASE_DIR_PATH)
-        print("CREATED")
-    return os.path.exists(DATABASE_DIR_PATH)
+def mkdirs(dirs_path) -> bool:
+    if not os.path.exists(dirs_path):
+        os.makedirs(dirs_path)
+    return os.path.exists(dirs_path)
 
-# create_dirs()
+# mkdirs(DATABASE_DIR_PATH)
 
-con = sqlite3.connect(":memory:")
-cur = con.cursor()
 
-class PlayerMasterSql:
-    def __init__(self, cur) -> None:
-        self.table_name = "player_master"
-        self.cur = cur
-
-    def create(self):
+class RPG_CALL_ONCE:
+    def __init__(self, database):
+        self.con = sqlite3.connect(database)
+        self.cur = self.con.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS player_master (id INTEGER PRIMARY KEY AUTOINCREMENT, name text)")
+        self.cur.execute("CREATE TABLE IF NOT EXISTS player_status (id int, money int, class_id int, rank_exp int)")
+        self.cur.execute("CREATE TABLE IF NOT EXISTS rank_master (rank_id int, rank_exp int)")
+        self.insert_rank_master()
+        self.cur.execute("CREATE TABLE IF NOT EXISTS class_master (class_id INTEGER PRIMARY KEY AUTOINCREMENT, class_name text, rank_id int)")
+        self.insert_class_master()
+        self.con.commit()
 
-    def insert(self, player_name):
-        insert_sql = f"INSERT INTO player_master(name) VALUES ('{player_name}')"
-        self.cur.execute(insert_sql)
+
+    def insert_class_master(self):
+        class_data =  [
+            ("戦士", 0),
+            ("僧侶", 0),
+            ("魔法使い", 0),
+            ("アサシン", 10),
+            ("勇者", 15)
+        ]
+        self.cur.executemany("INSERT INTO class_master(class_name, rank_id) VALUES (?, ?)", class_data)
+
+    def insert_rank_master(self):
+        rank_data = [(i, 10*(i-1)) for i in range(1, 21)]
+        self.cur.executemany("INSERT INTO rank_master VALUES (?, ?)", rank_data)
+
+    def get_cursor(self):
+        return self.cur
 
 
+class PlayerDataBase:
+    def __init__(self, cur) -> None:
+        self.cur = cur
+        self.count = self.count_regist()
 
-pms = PlayerMasterSql(cur)
-pms.create()
-player_count = cur.execute("SELECT COUNT(*) FROM player_master").fetchone()[0]
-if 0 == player_count:
-    player_name = input("名前を入力してください > ")
-    pms.insert(player_name)
+    def select(self, _format="{} {}"):
+        print("どのプレイヤーでプレイしますか?")
+        for idx, name in self.cur.execute("SELECT * FROM player_master"):
+            print(_format.format(idx, name))
+        idx = int(input("> "))
+        return self.cur.execute("SELECT id, name FROM player_master WHERE id={}".format(idx)).fetchone()
 
-print("どのプレイヤーでプレイしますか?")
-for idx, name in cur.execute("SELECT * FROM player_master"):
-    print(idx, name)
-player_idx = int(input("> "))
+    def regist(self):
+        name = input("名前を入力してください: ")
+        self.cur.execute("INSERT INTO player_master(name) VALUES ('{}')".format(name))
+        self.count = self.count_regist()
+        self.cur.execute("INSERT INTO player_status VALUES (?, ?, ?, ?)", (self.count, 0, 1, 0))
 
-cur.execute("CREATE TABLE IF NOT EXISTS player_status (id int, money int, class_id int, rank_exp int)")
-cur.execute("INSERT INTO player_status VALUES (?, ?, ?, ?)", (1, 0, 0, 0))
+    def count_regist(self) -> bool:
+        return self.cur.execute("SELECT COUNT(*) FROM player_master").fetchone()[0]
 
-cur.execute("UPDATE player_status SET rank_exp=1000 WHERE id={}".format(player_idx))
-rank_data = [(i, 10*(i-1)) for i in range(1, 21)]
+    def start(self):
+        if self.count == 0:
+            self.regist()
+        return self.select()
 
-cur.execute("CREATE TABLE IF NOT EXISTS rank_master (rank_id int, rank_exp int)")
-cur.executemany("INSERT INTO rank_master VALUES (?, ?)", rank_data)
+class Player:
+    def __init__(self, cur, idx=1) -> None:
+        self.cur = cur
+        self.idx = idx
 
-player_rank = cur.execute("SELECT MAX(rank_id) FROM rank_master as rm JOIN player_status as ps WHERE ps.rank_exp >= rm.rank_exp AND ps.id={}".format(player_idx)).fetchone()[0]
+    def get_status(self):
+        money, class_id, rank_exp = self.cur.execute("SELECT money, class_id, rank_exp FROM player_status WHERE id={}".format(self.idx)).fetchall()[0]
+        return money, class_id, rank_exp
 
-cur.execute("CREATE TABLE IF NOT EXISTS class_master (class_id int, class_name text, rank_id int)")
-class_data = [
-    (0, "戦士", 0),
-    (1, "僧侶", 0),
-    (2, "魔法使い", 0),
-    (3, "アサシン", 10),
-    (4, "勇者", 15)
-]
-cur.executemany("INSERT INTO class_master VALUES (?, ?, ?)", class_data)
 
-idx, name = cur.execute("SELECT * FROM player_master WHERE id={}".format(player_idx)).fetchone()
+once = RPG_CALL_ONCE(":memory:")
+
+cur = once.get_cursor()
+player_db = PlayerDataBase(cur)
+
+player_idx, player_name = player_db.start()
+player = Player(cur)
+player.get_status()
+
+player_rank = player.status.get_rank_sql(cur)
+
+idx, name = player.get_player(cur)
 print(f"{idx=} {name=} {player_rank=}")
 
-for idx, name in cur.execute("SELECT * FROM player_master"):
-    print(idx, name)
-player_idx = int(input("> "))
-
-player_rank = cur.execute(
-    "SELECT MAX(rank_id) FROM rank_master as rm JOIN player_status as ps WHERE ps.rank_exp >= rm.rank_exp AND ps.id={}".format(player_idx)
-    ).fetchone()[0]
-
-idx, name = cur.execute("SELECT * FROM player_master WHERE id={}".format(player_idx)).fetchone()
+player.status.add_rank_exp(1000)
+player.status.set_rank_sql(cur)
+idx, name = player.get_player(cur)
+player_rank = player.status.get_rank_sql(cur)
 print(f"{idx=} {name=} {player_rank=}")

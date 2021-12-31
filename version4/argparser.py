@@ -2,6 +2,17 @@ import argparse
 
 
 parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-id", "--playerId",
+    default=1,
+    type=int,
+    help="This is a player id"
+)
+parser.add_argument(
+    "-dev", "--develop",
+    help="This is a develop mode",
+    action="store_true"
+)
 group = parser.add_mutually_exclusive_group()
 group.add_argument(
     "-d", "--debug",
@@ -30,3 +41,6 @@ group.add_argument(
 )
 
 args = parser.parse_args()
+
+if __name__ == "__main__":
+    print(args)
