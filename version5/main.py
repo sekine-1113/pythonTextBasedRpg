@@ -1,9 +1,7 @@
 import os
 import sqlite3
-from sqlite3.dbapi2 import Cursor
 
 from settings import DATABASE_DIR_PATH
-from player import PlayerFactory
 
 
 def mkdirs(dirs_path) -> bool:
