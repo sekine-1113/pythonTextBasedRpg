@@ -1,22 +1,18 @@
-import os
+import sys
 import sqlite3
 from sqlite3.dbapi2 import Cursor
-from pprint import pprint
+from pathlib import Path
 
 
-from settings import DATABASE_DIR_PATH
+from settings import Singleton, mkdirs, DATABASE_DIR_PATH
+from utils.windows import Color, BackGroundColor, unlock_ansi
 
-
-def mkdirs(dirs_path) -> bool:
-    if not os.path.exists(dirs_path):
-        os.makedirs(dirs_path)
-    return os.path.exists(dirs_path)
 
 # mkdirs(DATABASE_DIR_PATH)
 
-
-class RPG_CALL_ONCE:
-    def __init__(self, database):
+class RPG_CALL_ONCE(Singleton):
+    def __init__(self, database: Path|str):
+        unlock_ansi()
         self.con = sqlite3.connect(database)
         self.cur: Cursor = self.con.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS player_master (id INTEGER PRIMARY KEY AUTOINCREMENT, name text)")
@@ -138,6 +134,16 @@ class PlayerDataBase:
             self.regist()
         return self.select()
 
+class IActorEntity:
+    def set_abilities(self, abilities):
+        ...
+
+    def execute_ability(self, source, target):
+        ...
+
+    def is_dead(self):
+        ...
+
 
 class ActorEntity:
     def __init__(self, hitpoint, strength, defence, magicpower, critical) -> None:
@@ -152,10 +158,10 @@ class ActorEntity:
         self.critical = critical
         self.abitilies = None
 
-    def set_abilities(self, abilities):
+    def set_abilities(self, abilities) -> None:
         self.abitilies = abilities
 
-    def execute_ability(self, source, target):
+    def execute_ability(self, source: "ActorEntity", target: "ActorEntity") -> None:
         abilities = []
         print("id name description count type fixed_value value")
         for i, ability in enumerate(self.abitilies, 1):
@@ -164,7 +170,7 @@ class ActorEntity:
         idx = int(input("> "))-1
         abilities[idx].execute(source, target)
 
-    def is_dead(self):
+    def is_dead(self) -> bool:
         return self.hitpoint <= 0
 
 class Ability:
@@ -176,14 +182,16 @@ class Ability:
         self.fixed_value = fixed_value
         self.value = value
 
-    def execute(self, source: ActorEntity, target: ActorEntity):
+    def execute(self, source: ActorEntity, target: ActorEntity) -> int:
         if self.count <= 0:
-            raise Exception
+            return -1
         self.count -= 1
         if self.type_ == 0:
             self.attack(source, target)
+            return 1
         elif self.type_ == 1:
             self.heal(source, target)
+            return 0
 
     def attack(self, source: ActorEntity, target: ActorEntity):
         target.hitpoint -= self.fixed_value + source.strength * self.value
@@ -198,28 +206,37 @@ class Ability:
 
 
 class Player:
-    def __init__(self, cur, idx) -> None:
+    def __init__(self, cur, idx, entity_model=None) -> None:
         self.cur = cur
         self.idx = idx
+        self.entity_model: IActorEntity = entity_model
 
     def get_class_status(self):
         class_id = self.get_class_id()
         level = self.get_level()
-        return self.cur.execute("""
+        try:
+            return self.cur.execute("""
                         SELECT hitpoint, strength, defence, magicpower, critical
                         FROM class_status_master
                         WHERE id=?
                         AND level=?
                         """, (class_id, level)).fetchall()[0]
+        except IndexError:
+            sys.exit(Color.RED+"[ERROR]"+Color.RESET+"list index out of range")
 
     def get_entity(self):
-        entity = ActorEntity(*self.get_class_status())
+        if self.entity_model is None:
+            self.entity_model = ActorEntity
+        entity = self.entity_model(*self.get_class_status())
         entity.set_abilities(self.get_ability())
         return entity
 
     def get_player(self):
         idx, name = self.cur.execute("SELECT id, name FROM player_master WHERE id=?", (self.idx,)).fetchone()
         return idx, name
+
+    def set_class_id(self, class_id):
+        self.cur.execute("UPDATE player_status SET class_id=? WHERE id=?", (class_id, self.idx))
 
     def get_class_id(self):
         return self.cur.execute("SELECT class_id FROM player_status").fetchone()[0]
@@ -288,14 +305,18 @@ class Player:
         self.cur.execute("UPDATE player_master SET name=? WHERE id=?", (name, self.idx))
 
     def show_status(self):
-        _, name = self.get_player()
-        rank = self.get_rank()
-        money, _, _ = self.get_status()
-        class_name = self.get_class()
-        class_level = self.get_level()
         class_status = self.get_class_status()
-        print("Name Rank Money Class Level Status")
-        print(name, rank, money, class_name, class_level, class_status)
+        print("名前:", self.get_player()[1])
+        print("ランク:", self.get_rank())
+        print("ゴールド:", self.get_status()[0])
+        print("クラス:", self.get_class())
+        print("レベル:", self.get_level())
+        print("ステータス")
+        print("HP:", class_status[0])
+        print("攻撃力:", class_status[1])
+        print("守備力:", class_status[2])
+        print("魔力:", class_status[3])
+        print("会心率:", class_status[4])
 
 
 class PlayerFactory:
@@ -318,6 +339,7 @@ class EnemyFactory:
     def __init__(self) -> None:
         pass
 
+
 once = RPG_CALL_ONCE(":memory:")  # 初期化及びデータベースの構築
 con = once.get_connect()
 cur = once.get_cursor()  # データベースオブジェクトの取得
@@ -325,8 +347,9 @@ player_factory = PlayerFactory(cur, PlayerDataBase)  # プレイヤーオブジ�
 player = player_factory.create(1)  # プレイヤーオブジェクトを生成
 player.show_status()
 player.set_rank_sql(1000)  # ランクEXPに加算
-player.set_class_exp(1000)
-# player.show_status()
+player.set_class_id(2)
+# player.set_class_exp(1000)
+player.show_status()
 # player.rename()
 # player.show_status()
 player_entity = player.get_entity()
