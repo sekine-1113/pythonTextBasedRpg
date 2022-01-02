@@ -36,10 +36,10 @@ class RPG_CALL_ONCE:
             critical int,
             need_exp)""")
         self.insert_class_status_master()
-        self.cur.execute("CREATE TABLE IF NOT EXISTS ability (id int, name text)")
-        self.cur.execute("INSERT INTO ability VALUES (1, '2倍攻撃')")
-        self.cur.execute("INSERT INTO ability VALUES (2, '3倍攻撃')")
-        self.cur.execute("INSERT INTO ability VALUES (3, '回復')")
+        self.cur.execute("CREATE TABLE IF NOT EXISTS ability (id int, name text, description text, count int, type int, fixed_value int, value int)")
+        self.cur.execute("INSERT INTO ability VALUES (1, '2倍攻撃', '2倍の力で攻撃する', 15, 0, 1, 2)")
+        self.cur.execute("INSERT INTO ability VALUES (2, '3倍攻撃', '3倍の力で攻撃する', 10, 0, 1, 3)")
+        self.cur.execute("INSERT INTO ability VALUES (3, '回復', '回復する', 10, 1, 10, 1)")
         self.cur.execute("CREATE TABLE IF NOT EXISTS classes_ability_master (id int, level int, ability_id int)")
         self.cur.execute("INSERT INTO classes_ability_master VALUES (1, 1, 1)")
         self.cur.execute("INSERT INTO classes_ability_master VALUES (1, 2, 2)")
@@ -77,67 +77,7 @@ class RPG_CALL_ONCE:
                 1	17	96	60	42	2	2	192
                 1	18	100	63	44	2	2	204
                 1	19	104	66	46	2	2	216
-                1	20	108	69	48	2	2	228
-                2	1	30	8	8	6	2	0
-                2	2	32	10	10	9	2	12
-                2	3	34	12	12	12	2	24
-                2	4	36	14	14	15	2	36
-                2	5	38	16	16	18	2	48
-                2	6	40	18	18	21	2	60
-                2	7	42	20	20	24	2	72
-                2	8	44	22	22	27	2	84
-                2	9	46	24	24	30	2	96
-                2	10	48	26	26	33	2	108
-                2	11	50	28	28	36	2	120
-                2	12	52	30	30	39	2	132
-                2	13	54	32	32	42	2	144
-                2	14	56	34	34	45	2	156
-                2	15	58	36	36	48	2	168
-                2	16	60	38	38	51	2	180
-                2	17	62	40	40	54	2	192
-                2	18	64	42	42	57	2	204
-                2	19	66	44	44	60	2	216
-                2	20	68	46	46	63	2	228
-                3	1	24	6	7	10	2	0
-                3	2	27	7	8	12	2	12
-                3	3	30	8	9	14	2	24
-                3	4	33	9	10	16	2	36
-                3	5	36	10	11	18	2	48
-                3	6	39	11	12	20	2	60
-                3	7	42	12	13	22	2	72
-                3	8	45	13	14	24	2	84
-                3	9	48	14	15	26	2	96
-                3	10	51	15	16	28	2	108
-                3	11	54	16	17	30	2	120
-                3	12	57	17	18	32	2	132
-                3	13	60	18	19	34	2	144
-                3	14	63	19	20	36	2	156
-                3	15	66	20	21	38	2	168
-                3	16	69	21	22	40	2	180
-                3	17	72	22	23	42	2	192
-                3	18	75	23	24	44	2	204
-                3	19	78	24	25	46	2	216
-                3	20	81	25	26	48	2	228
-                4	1	30	14	12	0	4	0
-                4	2	32	17	13	0	4	12
-                4	3	34	20	14	0	4	24
-                4	4	36	23	15	0	4	36
-                4	5	38	26	16	0	4	48
-                4	6	40	29	17	0	4	60
-                4	7	42	32	18	0	4	72
-                4	8	44	35	19	0	4	84
-                4	9	46	38	20	0	4	96
-                4	10	48	41	21	0	4	108
-                4	11	50	44	22	0	4	120
-                4	12	52	47	23	0	4	132
-                4	13	54	50	24	0	4	144
-                4	14	56	53	25	0	4	156
-                4	15	58	56	26	0	4	168
-                4	16	60	59	27	0	4	180
-                4	17	62	62	28	0	4	192
-                4	18	64	65	29	0	4	204
-                4	19	66	68	30	0	4	216
-                4	20	68	71	31	0	4	228""".replace("\t", " ")
+                1	20	108	69	48	2	2	228""".replace("\t", " ")
         data = list(map(lambda x: x.split(), data.split("\n")))
         for i, dt in enumerate(data):
             data[i] = tuple(map(int, dt))
@@ -199,11 +139,71 @@ class PlayerDataBase:
         return self.select()
 
 
+class ActorEntity:
+    def __init__(self, hitpoint, strength, defence, magicpower, critical) -> None:
+        self.hitpoint = hitpoint
+        self.max_hitpoint = self.hitpoint
+        self.strength = strength
+        self.origin_strength = self.strength
+        self.defence = defence
+        self.origin_defence = self.defence
+        self.magicpower = magicpower
+        self.origin_magicpower = self.magicpower
+        self.critical = critical
+
+    def is_dead(self):
+        return self.hitpoint <= 0
+
+class Ability:
+    def __init__(self, name, description, count, type_, fixed_value, value) -> None:
+        self.name = name
+        self.description = description
+        self.count = count
+        self.type_ = type_
+        self.fixed_value = fixed_value
+        self.value = value
+
+    def execute(self, source: ActorEntity, target: ActorEntity):
+        if self.count <= 0:
+            raise Exception
+        self.count -= 1
+        if self.type_ == 0:
+            self.attack(source, target)
+        elif self.type_ == 1:
+            self.heal(source, target)
+
+    def attack(self, source: ActorEntity, target: ActorEntity):
+        target.hitpoint -= self.fixed_value + source.strength * self.value
+
+    def heal(self, source: ActorEntity, target: ActorEntity):
+        target.hitpoint += self.fixed_value + source.magicpower * self.value
+        if target.max_hitpoint < target.hitpoint:
+            target.hitpoint = target.max_hitpoint
+
+    def __repr__(self) -> str:
+        return f"{self.name} {self.count}"
+
+
+
+
 
 class Player:
     def __init__(self, cur, idx) -> None:
         self.cur = cur
         self.idx = idx
+
+    def get_class_status(self):
+        class_id = self.get_class_id()
+        level = self.get_level()
+        return self.cur.execute("""
+                        SELECT hitpoint, strength, defence, magicpower, critical
+                        FROM class_status_master
+                        WHERE id=?
+                        AND level=?
+                        """, (class_id, level)).fetchall()[0]
+
+    def get_entity(self):
+        return ActorEntity(*self.get_class_status())
 
     def get_player(self):
         idx, name = self.cur.execute("SELECT id, name FROM player_master WHERE id=?", (self.idx,)).fetchone()
@@ -214,7 +214,7 @@ class Player:
 
     def get_class(self):
         class_id = self.get_class_id()
-        _, cls_name = self.cur.execute("SELECT id, name FROM class_master WHERE id=?", (class_id,)).fetchone()
+        cls_name = self.cur.execute("SELECT name FROM class_master WHERE id=?", (class_id,)).fetchone()[0]
         return cls_name
 
     def get_status(self):
@@ -224,11 +224,22 @@ class Player:
     def get_ability(self):
         level = self.get_level()
         return self.cur.execute(
-            """SELECT * FROM ability
+            """
+            SELECT ability.name, ability.description, ability.count, ability.type, ability.fixed_value, ability.value
+            FROM ability
             JOIN classes_ability_master
             WHERE ability.id=classes_ability_master.ability_id
             AND classes_ability_master.level<=?
             """, (level,)).fetchall()
+
+    def execute_ability(self, source, target):
+        abilities = []
+        print("id name description count type fixed_value value")
+        for i, ability in enumerate(self.get_ability(), 1):
+            abilities.append(Ability(*ability))
+            print(i, *ability)
+        idx = int(input("> "))-1
+        abilities[idx].execute(source, target)
 
     def get_rank_exp(self):
         rank_exp = self.cur.execute("SELECT rank_exp FROM player_status WHERE id=?", (self.idx,)).fetchone()[0]
@@ -277,8 +288,11 @@ class Player:
         money, _, _ = self.get_status()
         class_name = self.get_class()
         class_level = self.get_level()
-        print("ID Name Rank Money Class Level")
-        print(idx, name, rank, money, class_name, class_level)
+        class_status = self.get_class_status()
+        print("ID Name Rank Money Class Level Status")
+        print(idx, name, rank, money, class_name, class_level, class_status)
+
+
 
 
 class PlayerFactory:
@@ -293,10 +307,13 @@ class PlayerFactory:
         idx = self.player_database.count_regist()
         return Player(self.cur, idx)
 
-
     def check(self, idx):
         return self.player_database.is_regist(idx)
 
+
+class EnemyFactory:
+    def __init__(self) -> None:
+        pass
 
 once = RPG_CALL_ONCE(":memory:")  # 初期化及びデータベースの構築
 con = once.get_connect()
@@ -304,12 +321,18 @@ cur = once.get_cursor()  # データベースオブジェクトの取得
 player_factory = PlayerFactory(cur, PlayerDataBase)  # プレイヤーオブジェクトのファクトリークラス
 player = player_factory.create(1)  # プレイヤーオブジェクトを生成
 # player2 = player_factory.create(2)  # プレイヤーオブジェクトを生成
-player.show_status()
-player.set_rank_sql(1000)  # ランクEXPに加算
-player.set_class_exp(1000)
-player.show_status()
+# player.show_status()
+# player.set_rank_sql(1000)  # ランクEXPに加算
+# player.set_class_exp(1000)
+# player.show_status()
 # player.rename()
 # player.show_status()
 # show_player(player2)
-pprint(player.get_ability())
+player_entity = player.get_entity()
+
+while True:
+    if player_entity.is_dead():
+        print("you lose!")
+        break
+    player.execute_ability(player_entity, player_entity)
 once.close()
