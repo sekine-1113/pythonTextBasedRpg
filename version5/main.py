@@ -1,5 +1,6 @@
 import os
 import sqlite3
+from sqlite3.dbapi2 import Cursor
 
 from settings import DATABASE_DIR_PATH
 
@@ -42,10 +43,18 @@ class RPG_CALL_ONCE:
     def get_cursor(self):
         return self.cur
 
+    def get_connect(self):
+        return self.con
+
+    def close(self):
+        self.con.commit()
+        self.cur.close()
+        self.con.close()
+
 
 class PlayerDataBase:
     def __init__(self, cur) -> None:
-        self.cur = cur
+        self.cur: Cursor = cur
         self.count = self.count_regist()
 
     def select(self, _format="{} {}"):
@@ -53,16 +62,24 @@ class PlayerDataBase:
         for idx, name in self.cur.execute("SELECT * FROM player_master"):
             print(_format.format(idx, name))
         idx = int(input("> "))
-        return self.cur.execute("SELECT id, name FROM player_master WHERE id={}".format(idx)).fetchone()
+        return self.cur.execute("SELECT id, name FROM player_master WHERE id=?", (idx,)).fetchone()
 
     def regist(self):
         name = input("名前を入力してください: ")
-        self.cur.execute("INSERT INTO player_master(name) VALUES ('{}')".format(name))
+        self.cur.execute("INSERT INTO player_master(name) VALUES (?)", (name,))
         self.count = self.count_regist()
         self.cur.execute("INSERT INTO player_status VALUES (?, ?, ?, ?)", (self.count, 0, 1, 0))
 
+    def rename(self, name=None):
+        print("どのプレイヤーの名前を変更しますか?")
+        for idx, name in self.cur.execute("SELECT * FROM player_master"):
+            print("{} {}".format(idx, name))
+        idx = int(input("> "))
+        name = input("new name: ")
+        self.cur.execute("UPDATE player_master SET name=? WHERE id=?", (name, idx))
+
     def is_regist(self, idx):
-        return self.cur.execute("SELECT COUNT(*) FROM player_master WHERE id={}".format(idx)).fetchone()[0] == 1
+        return self.cur.execute("SELECT COUNT(*) FROM player_master WHERE id=?", (idx,)).fetchone()[0] == 1
 
     def count_regist(self) -> bool:
         return self.cur.execute("SELECT COUNT(*) FROM player_master").fetchone()[0]
@@ -80,7 +97,7 @@ class Player:
         self.idx = idx
 
     def get_player(self):
-        idx, name = self.cur.execute("SELECT id, name FROM player_master WHERE id={}".format(self.idx)).fetchone()
+        idx, name = self.cur.execute("SELECT id, name FROM player_master WHERE id=?", (self.idx,)).fetchone()
         return idx, name
 
     def get_status(self):
@@ -88,7 +105,7 @@ class Player:
         return money, class_id, rank_exp
 
     def get_rank_exp(self):
-        rank_exp = self.cur.execute("SELECT rank_exp FROM player_status WHERE id={}".format(self.idx)).fetchone()[0]
+        rank_exp = self.cur.execute("SELECT rank_exp FROM player_status WHERE id=?", (self.idx,)).fetchone()[0]
         return rank_exp
 
     def get_rank_sql(self):
@@ -96,23 +113,31 @@ class Player:
             """
             SELECT MAX(rank_id) FROM rank_master JOIN player_status
             WHERE (player_status.rank_exp >= rank_master.rank_exp)
-            AND player_status.id={}""".format(self.idx)).fetchone()[0]
+            AND player_status.id=?""", (self.idx,)).fetchone()[0]
 
     def set_rank_sql(self, exp=0):
         rank_exp = int(self.get_rank_exp()) + exp
-        self.cur.execute("UPDATE player_status SET rank_exp={} WHERE id={}".format(rank_exp, self.idx))
+        self.cur.execute("UPDATE player_status SET rank_exp=? WHERE id=?", (rank_exp, self.idx))
+
+    def rename(self):
+        name = input("新しい名前を入力してください: ")
+        self.cur.execute("UPDATE player_master SET name=? WHERE id=?", (name, self.idx))
 
 
 class PlayerFactory:
     def __init__(self, cur, player_database: PlayerDataBase) -> None:
-        self.cur = cur
-        self.player_database = player_database(self.cur)
+        self.cur: Cursor = cur
+        self.player_database: PlayerDataBase = player_database(self.cur)
 
     def create(self, idx):
         if self.check(idx):
-            return Player(cur, idx)
+            return Player(self.cur, idx)
         self.player_database.regist()
-        return Player(cur, idx)
+        idx = self.player_database.count_regist()
+        return Player(self.cur, idx)
+
+    def rename(self, name=None):
+        self.player_database.rename(name)
 
     def check(self, idx):
         return self.player_database.is_regist(idx)
@@ -125,11 +150,15 @@ def show_player(player):
 
 
 once = RPG_CALL_ONCE(":memory:")  # 初期化及びデータベースの構築
+con = once.get_connect()
 cur = once.get_cursor()  # データベースオブジェクトの取得
 player_factory = PlayerFactory(cur, PlayerDataBase)  # プレイヤーオブジェクトのファクトリークラス
 player = player_factory.create(1)  # プレイヤーオブジェクトを生成
-player2 = player_factory.create(2)  # プレイヤーオブジェクトを生成
+# player2 = player_factory.create(2)  # プレイヤーオブジェクトを生成
 show_player(player)
 player.set_rank_sql(1000)  # ランクEXPに加算
 show_player(player)
-show_player(player2)
+player.rename()
+show_player(player)
+# show_player(player2)
+once.close()
