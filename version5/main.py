@@ -150,6 +150,19 @@ class ActorEntity:
         self.magicpower = magicpower
         self.origin_magicpower = self.magicpower
         self.critical = critical
+        self.abitilies = None
+
+    def set_abilities(self, abilities):
+        self.abitilies = abilities
+
+    def execute_ability(self, source, target):
+        abilities = []
+        print("id name description count type fixed_value value")
+        for i, ability in enumerate(self.abitilies, 1):
+            abilities.append(Ability(*ability))
+            print(i, *ability)
+        idx = int(input("> "))-1
+        abilities[idx].execute(source, target)
 
     def is_dead(self):
         return self.hitpoint <= 0
@@ -184,9 +197,6 @@ class Ability:
         return f"{self.name} {self.count}"
 
 
-
-
-
 class Player:
     def __init__(self, cur, idx) -> None:
         self.cur = cur
@@ -203,7 +213,9 @@ class Player:
                         """, (class_id, level)).fetchall()[0]
 
     def get_entity(self):
-        return ActorEntity(*self.get_class_status())
+        entity = ActorEntity(*self.get_class_status())
+        entity.set_abilities(self.get_ability())
+        return entity
 
     def get_player(self):
         idx, name = self.cur.execute("SELECT id, name FROM player_master WHERE id=?", (self.idx,)).fetchone()
@@ -214,11 +226,14 @@ class Player:
 
     def get_class(self):
         class_id = self.get_class_id()
-        cls_name = self.cur.execute("SELECT name FROM class_master WHERE id=?", (class_id,)).fetchone()[0]
+        cls_name = self.cur.execute(
+            "SELECT name FROM class_master WHERE id=?", (class_id,)
+        ).fetchone()[0]
         return cls_name
 
     def get_status(self):
-        money, class_id, rank_exp = self.cur.execute("SELECT money, class_id, rank_exp FROM player_status WHERE id={}".format(self.idx)).fetchall()[0]
+        money, class_id, rank_exp = self.cur.execute(
+            "SELECT money, class_id, rank_exp FROM player_status WHERE id=?", (self.idx, )).fetchall()[0]
         return money, class_id, rank_exp
 
     def get_ability(self):
@@ -231,15 +246,6 @@ class Player:
             WHERE ability.id=classes_ability_master.ability_id
             AND classes_ability_master.level<=?
             """, (level,)).fetchall()
-
-    def execute_ability(self, source, target):
-        abilities = []
-        print("id name description count type fixed_value value")
-        for i, ability in enumerate(self.get_ability(), 1):
-            abilities.append(Ability(*ability))
-            print(i, *ability)
-        idx = int(input("> "))-1
-        abilities[idx].execute(source, target)
 
     def get_rank_exp(self):
         rank_exp = self.cur.execute("SELECT rank_exp FROM player_status WHERE id=?", (self.idx,)).fetchone()[0]
@@ -261,7 +267,6 @@ class Player:
         self.cur.execute("UPDATE player_classes_exp SET class_exp=? WHERE id=?", (class_exp, self.idx))
 
     def get_level(self):
-        """id money class_id rank_exp id class_id class_exp id level hitpoint strength defence magicpower critical need_exp"""
         return self.cur.execute(
             """
             SELECT MAX(csm.level) FROM (SELECT id, class_id FROM player_status) as ps
@@ -283,16 +288,14 @@ class Player:
         self.cur.execute("UPDATE player_master SET name=? WHERE id=?", (name, self.idx))
 
     def show_status(self):
-        idx, name = self.get_player()
+        _, name = self.get_player()
         rank = self.get_rank()
         money, _, _ = self.get_status()
         class_name = self.get_class()
         class_level = self.get_level()
         class_status = self.get_class_status()
-        print("ID Name Rank Money Class Level Status")
-        print(idx, name, rank, money, class_name, class_level, class_status)
-
-
+        print("Name Rank Money Class Level Status")
+        print(name, rank, money, class_name, class_level, class_status)
 
 
 class PlayerFactory:
@@ -320,19 +323,16 @@ con = once.get_connect()
 cur = once.get_cursor()  # データベースオブジェクトの取得
 player_factory = PlayerFactory(cur, PlayerDataBase)  # プレイヤーオブジェクトのファクトリークラス
 player = player_factory.create(1)  # プレイヤーオブジェクトを生成
-# player2 = player_factory.create(2)  # プレイヤーオブジェクトを生成
-# player.show_status()
-# player.set_rank_sql(1000)  # ランクEXPに加算
-# player.set_class_exp(1000)
+player.show_status()
+player.set_rank_sql(1000)  # ランクEXPに加算
+player.set_class_exp(1000)
 # player.show_status()
 # player.rename()
 # player.show_status()
-# show_player(player2)
 player_entity = player.get_entity()
-
 while True:
     if player_entity.is_dead():
         print("you lose!")
         break
-    player.execute_ability(player_entity, player_entity)
+    player_entity.execute_ability(player_entity, player_entity)
 once.close()
