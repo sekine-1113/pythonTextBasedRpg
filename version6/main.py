@@ -6,28 +6,28 @@ from pathlib import Path
 
 from settings import Singleton, mkdirs, DATABASE_DIR_PATH
 from utils.windows import Color, BackGroundColor, unlock_ansi
-from battle_prototype import Battle
 
-class Input(Singleton):
+
+class Input:
     @classmethod
-    def integer(self, prompt="> "):
+    def integer(cls, prompt="> "):
         user_input = input(prompt)
         try:
             user_input = int(user_input)
             return user_input
         except ValueError:
-            return self.integer(prompt)
+            return cls.integer(prompt)
 
     @classmethod
-    def integer_with_range(self, prompt="> ", _min=0, _max=0):
+    def integer_with_range(cls, prompt="> ", _min=0, _max=0):
         user_input = input(prompt)
         try:
             user_input = int(user_input)
             if _min <= user_input <= _max:
                 return user_input
-            return self.integer_with_range(prompt, _min, _max)
+            return cls.integer_with_range(prompt, _min, _max)
         except ValueError:
-            return self.integer_with_range(prompt, _min, _max)
+            return cls.integer_with_range(prompt, _min, _max)
 
 
 class RPG_CALL_ONCE(Singleton):
@@ -276,9 +276,6 @@ class Player:
             "SELECT money, class_id, rank_exp FROM player_status WHERE id=?", (self.idx, )).fetchall()[0]
         return money, class_id, rank_exp
 
-    def set_money(self, money):
-        self.cur.execute("UPDATE player_status SET money=? WHERE id=?", (money, self.idx))
-
     def get_abilities(self):
         level = self.get_level()
         abilities = self.cur.execute(
@@ -309,7 +306,7 @@ class Player:
         class_id = self.get_class_id()
         return self.cur.execute("SELECT * FROM player_classes_exp WHERE player_classes_exp.class_id=?", (class_id, )).fetchone()[0]
 
-    def add_class_exp(self, exp=0):
+    def set_class_exp(self, exp=0):
         class_exp = int(self.get_class_exp()) + exp
         self.cur.execute("UPDATE player_classes_exp SET class_exp=? WHERE id=?", (class_exp, self.idx))
 
@@ -326,7 +323,7 @@ class Player:
             AND player_classes_exp.class_exp >= csm.need_exp
             """, (self.idx, self.idx)).fetchone()[0]
 
-    def add_rank_sql(self, exp=0):
+    def set_rank_sql(self, exp=0):
         rank_exp = int(self.get_rank_exp()) + exp
         self.cur.execute("UPDATE player_status SET rank_exp=? WHERE id=?", (rank_exp, self.idx))
 
@@ -376,32 +373,21 @@ def main():
         player_factory = PlayerFactory(cur, PlayerDataBase)  # プレイヤーオブジェクトのファクトリークラス
         player = player_factory.create(1)  # プレイヤーオブジェクトを生成
         player.show_status()
-        # player.add_rank_sql(1000)  # ランクEXPに加算
+        player.set_rank_sql(1000)  # ランクEXPに加算
         # aplayer.set_class_id(2)
-        # player.add_class_exp(1000)
+        player.set_class_exp(1000)
         player.show_status()
+        # player.rename()
+        # player.show_status()
         player_entity = player.get_entity()
-        result = Battle(player_entity, player_entity).turn_clock()
-        if result == 0:
-            print("you lose")
-        elif result == 1:
-            old_level = player.get_level()
-            old_rank = player.get_rank()
-            player.add_class_exp(1000)
-            player.add_rank_sql(1000)
-            player.set_money(player.get_status()[0]+1000)
-            new_level = player.get_level()
-            new_rank = player.get_rank()
-            diff_level = new_level - old_level
-            diff_rank = new_rank - old_rank
-            if diff_level > 0:
-                print("Level Up!")
-            if diff_rank > 0:
-                print("Rank Up!")
-            print("you win")
-        elif result == -1:
-            print("撤退した")
-        player.show_status()
+        while True:
+            idx = player_entity.ability_select()
+            if idx < 0:
+                break
+            ability = player_entity.get_ability(idx)
+            quantity = player_entity.execute(idx)
+            print(ability.name, quantity)
+            break
 
 
 if __name__ == "__main__":
