@@ -2,7 +2,6 @@
 class Battle:
     def __init__(self, player, enemy) -> None:
         self.turn = 0
-        self.player_win = False
         self.player = player
         self.enemy = enemy
 
@@ -38,8 +37,8 @@ class Battle:
         return 0
 
     def enemy_turn(self):
-        idx = 0
-        ability = self.enemy.get_ability(idx)
+        ability = self.enemy.enemy_ai.select()
+        idx = self.enemy.enemy_ai.get_index(ability)
         quantity = self.enemy.execute(idx)
         print(ability.name)
         if ability.type_ == 0:
@@ -48,5 +47,4 @@ class Battle:
         elif ability.type_ == 1:
             self.enemy.take_heal(quantity)
             print("回復した!")
-        return 0
         return 0

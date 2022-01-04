@@ -1,8 +1,8 @@
 import sqlite3
+import sys
 import random
 from sqlite3.dbapi2 import Connection, Cursor
 from pathlib import Path
-
 
 from settings import Singleton, mkdirs, DATABASE_DIR_PATH
 from utils.windows import Color, BackGroundColor, unlock_ansi
@@ -180,8 +180,31 @@ class AbilityEntity:
     def can_use(self):
         return self.count > 0
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return f"{self.name} {self.count}"
+
+
+class EnemyAbilityAI:
+    def __init__(self, source, abilities):
+        self.source = source
+        self.abilities = abilities
+
+    def select(self):
+        abilities = []
+        for ability in self.abilities:
+            if ability.can_use():
+                abilities.append(ability)
+        probs = []
+        p = 100/len(abilities)
+        for ability in abilities:
+            if (self.source.hitpoint / self.source.max_hitpoint) < 0.5:
+                if ability.type_ == 1:  # heal
+                    p *= 2
+            probs.append(p)
+        return random.choices(abilities, probs, k=1)[0]
+
+    def get_index(self, ability):
+        return self.abilities.index(ability)
 
 
 class ActorEntity:
@@ -196,6 +219,10 @@ class ActorEntity:
         self.origin_magicpower = self.magicpower
         self.critical = critical
         self.abilities: list[AbilityEntity] = None
+        self.enemy_ai = None
+
+    def set_enemy_ai(self, ai):
+        self.enemy_ai = ai
 
     def set_abilities(self, abilities) -> None:
         self.abilities = abilities
@@ -212,7 +239,7 @@ class ActorEntity:
     def execute(self, idx) -> int:
         ability = self.get_ability(idx)
         if not ability.can_use():
-            raise Exception
+            raise Exception("残り使用可能回数は0です.")
         ability.count -= 1
         critical = self.critical >= random.randint(0, 100) >= 0
         if critical:
@@ -407,6 +434,7 @@ class PlayerFactory:
     def check(self, idx):
         return self.player_database.is_regist(idx)
 
+
 class QuestEntity:
     def __init__(self, name, desc, enemy_id, deff, money, rank_exp) -> None:
         self.name = name
@@ -490,17 +518,67 @@ class Enemy:
     def get_entity(self):
         entity = ActorEntity(*self.get_status())
         entity.set_abilities(self.get_abilities())
+        entity.set_enemy_ai(EnemyAbilityAI(entity, self.get_abilities()))
         return entity
+
 
 class EnemyFactory:
     def __init__(self, cur) -> None:
         self.cur = cur
 
     def create(self, idx):
-        return Enemy(self.cur, idx)
+        enemy = Enemy(self.cur, idx)
+        return enemy
+
+
+def title():
+    print("QuestRPG")
+    print("1: start")
+    print("2: config")
+    print("0: exit")
+    return Input.integer_with_range(_max=2)
+
+
+def start():
+    print("1: quest")
+    # print("2: gacha")
+    # print("3: equip")
+    print("4: status")
+    print("0: exit")
+    return Input.integer_with_range(_max=4)
+
+
+def config():
+    pass
+
 
 
 def main():
+    """
+    flow:
+        title
+            start or regist
+                quest
+                gacha
+                equip
+                status
+                exit
+            config
+                ...
+            exit
+
+    mode = title()
+    if mode == 0:
+        sys.exit("See you")
+    elif mode == 1:
+        smode = start()
+        if smode == 0:
+            sys.exit("See you")
+        elif smode == 1:
+            print("quest")
+    elif mode == 2:
+        config()
+    """
     with RPG_CALL_ONCE(":memory:") as once:
         cur = once.get_cursor()  # データベースオブジェクトの取得
         player_factory = PlayerFactory(cur, PlayerDataBase)  # プレイヤーオブジェクトのファクトリークラス
@@ -514,9 +592,8 @@ def main():
         quests = QuestsDataBase(cur)
         quest_idx = quests.select()
         quest = quests.get_entity(quest_idx)
-        enemy_idx = quest.enemy_id
         enemy_factory = EnemyFactory(cur)
-        enemy = enemy_factory.create(enemy_idx)
+        enemy = enemy_factory.create(quest.enemy_id)
         enemy_entity = enemy.get_entity()
         result = Battle(player_entity, enemy_entity).turn_clock()
         if result == 0:
