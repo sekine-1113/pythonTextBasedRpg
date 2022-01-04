@@ -31,8 +31,10 @@ class Battle:
         print(ability.name)
         if ability.type_ == 0:
             self.enemy.take_damage(quantity)
+            print("ダメージを与えた!")
         elif ability.type_ == 1:
             self.player.take_heal(quantity)
+            print("回復した!")
         return 0
 
     def enemy_turn(self):
@@ -42,6 +44,9 @@ class Battle:
         print(ability.name)
         if ability.type_ == 0:
             self.player.take_damage(quantity)
+            print("ダメージを受けた!")
         elif ability.type_ == 1:
             self.enemy.take_heal(quantity)
+            print("回復した!")
+        return 0
         return 0

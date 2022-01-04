@@ -1,33 +1,34 @@
-import sys
 import sqlite3
+import random
 from sqlite3.dbapi2 import Connection, Cursor
 from pathlib import Path
 
 
 from settings import Singleton, mkdirs, DATABASE_DIR_PATH
 from utils.windows import Color, BackGroundColor, unlock_ansi
+from battle_prototype import Battle
 
 
-class Input:
+class Input(Singleton):
     @classmethod
-    def integer(cls, prompt="> "):
+    def integer(self, prompt="> "):
         user_input = input(prompt)
         try:
             user_input = int(user_input)
             return user_input
         except ValueError:
-            return cls.integer(prompt)
+            return self.integer(prompt)
 
     @classmethod
-    def integer_with_range(cls, prompt="> ", _min=0, _max=0):
+    def integer_with_range(self, prompt="> ", _min=0, _max=0):
         user_input = input(prompt)
         try:
             user_input = int(user_input)
             if _min <= user_input <= _max:
                 return user_input
-            return cls.integer_with_range(prompt, _min, _max)
+            return self.integer_with_range(prompt, _min, _max)
         except ValueError:
-            return cls.integer_with_range(prompt, _min, _max)
+            return self.integer_with_range(prompt, _min, _max)
 
 
 class RPG_CALL_ONCE(Singleton):
@@ -62,6 +63,46 @@ class RPG_CALL_ONCE(Singleton):
         self.cur.execute("INSERT INTO classes_ability_master VALUES (1, 2, 2)")
         self.cur.execute("INSERT INTO classes_ability_master VALUES (1, 3, 3)")
         # self.cur.execute("CREATE TABLE IF NOT EXISTS quests_master (id INTEGER PRIMARY KEY AUTOINCREMENT, name text)")
+        self.cur.execute("""
+            CREATE TABLE IF NOT EXISTS quests_master (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name text,
+                description text,
+                enemy_id int,
+                difficulty int,
+                money int,
+                rank_exp int
+            )""")
+        self.cur.execute("""INSERT INTO quests_master(name, description, enemy_id, difficulty, money, rank_exp)
+                VALUES ('ゴブリン討伐', 'ゴブリンを討伐せよ', 1, 1, 10, 10)""")
+        self.cur.execute("""INSERT INTO quests_master(name, description, enemy_id, difficulty, money, rank_exp)
+                VALUES ('ドラゴン討伐', 'ドラゴンを討伐せよ', 2, 2, 20, 20)""")
+
+        self.cur.execute("""
+                CREATE TABLE IF NOT EXISTS enemies_master (
+                    id int,
+                    name text,
+                    hitpoint int,
+                    strength int,
+                    defence int,
+                    magicpower int,
+                    critical int,
+                    exp int,
+                    ability_id int
+                )
+                """)
+        self.cur.execute("""
+                INSERT INTO enemies_master
+                VALUES (1, 'ゴブリン', 24, 8, 4, 0, 0, 10, 1)
+                """)
+        self.cur.execute("""
+                INSERT INTO enemies_master
+                VALUES (2, 'ドラゴン', 54, 16, 12, 4, 0, 100, 1)
+                """)
+        self.cur.execute("""
+                INSERT INTO enemies_master
+                VALUES (2, 'ドラゴン', 54, 16, 12, 4, 0, 100, 2)
+                """)
         self.con.commit()
 
     def __enter__(self):
@@ -69,7 +110,6 @@ class RPG_CALL_ONCE(Singleton):
 
     def __exit__(self, type, value, traceback):
         self.close()
-
 
     def insert_class_master(self):
         class_data =  [
@@ -174,16 +214,21 @@ class ActorEntity:
         if not ability.can_use():
             raise Exception
         ability.count -= 1
+        critical = self.critical >= random.randint(0, 100) >= 0
+        if critical:
+            print("Critical!")
         if ability.type_ == 0:  # 攻撃
             damage = ability.fixed_value + ability.value * self.strength
+            damage += damage * 0.2 * critical
             return damage
         elif ability.type_ == 1:  # 回復
             heal = ability.fixed_value + ability.value * self.magicpower
+            heal += heal * 0.2 * critical
             return heal
         return 0
 
     def take_damage(self, damage):
-        self.hitpoint -= damage
+        self.hitpoint -= (damage - self.defence)
 
     def take_heal(self, heal):
         if self.hitpoint + heal > self.max_hitpoint:
@@ -239,15 +284,13 @@ class Player:
     def get_class_status(self):
         class_id = self.get_class_id()
         level = self.get_level()
-        try:
-            return self.cur.execute("""
-                        SELECT hitpoint, strength, defence, magicpower, critical
-                        FROM class_status_master
-                        WHERE id=?
-                        AND level=?
-                        """, (class_id, level)).fetchall()[0]
-        except IndexError:
-            sys.exit(Color.RED+"[ERROR]"+Color.RESET+"list index out of range")
+        return self.cur.execute("""
+            SELECT hitpoint, strength, defence, magicpower, critical
+            FROM class_status_master
+            WHERE id=?
+            AND level=?
+            """, (class_id, level)
+        ).fetchall()[0]
 
     def get_entity(self):
         entity = ActorEntity(*self.get_class_status())
@@ -275,6 +318,9 @@ class Player:
         money, class_id, rank_exp = self.cur.execute(
             "SELECT money, class_id, rank_exp FROM player_status WHERE id=?", (self.idx, )).fetchall()[0]
         return money, class_id, rank_exp
+
+    def set_money(self, money):
+        self.cur.execute("UPDATE player_status SET money=? WHERE id=?", (money, self.idx))
 
     def get_abilities(self):
         level = self.get_level()
@@ -306,7 +352,7 @@ class Player:
         class_id = self.get_class_id()
         return self.cur.execute("SELECT * FROM player_classes_exp WHERE player_classes_exp.class_id=?", (class_id, )).fetchone()[0]
 
-    def set_class_exp(self, exp=0):
+    def add_class_exp(self, exp=0):
         class_exp = int(self.get_class_exp()) + exp
         self.cur.execute("UPDATE player_classes_exp SET class_exp=? WHERE id=?", (class_exp, self.idx))
 
@@ -323,7 +369,7 @@ class Player:
             AND player_classes_exp.class_exp >= csm.need_exp
             """, (self.idx, self.idx)).fetchone()[0]
 
-    def set_rank_sql(self, exp=0):
+    def add_rank_sql(self, exp=0):
         rank_exp = int(self.get_rank_exp()) + exp
         self.cur.execute("UPDATE player_status SET rank_exp=? WHERE id=?", (rank_exp, self.idx))
 
@@ -361,10 +407,97 @@ class PlayerFactory:
     def check(self, idx):
         return self.player_database.is_regist(idx)
 
+class QuestEntity:
+    def __init__(self, name, desc, enemy_id, deff, money, rank_exp) -> None:
+        self.name = name
+        self.desc = desc
+        self.enemy_id = enemy_id
+        self.deff = deff
+        self.money = money
+        self.rank_exp = rank_exp
+
+    def __repr__(self) -> str:
+        return self.name
+
+
+class QuestsDataBase:
+    def __init__(self, cur) -> None:
+        self.cur = cur
+
+    def select(self):
+        quests = self.cur.execute("SELECT id, name FROM quests_master").fetchall()
+        for quest in quests:
+            print(*quest)
+        return int(input("> "))
+
+    def filtered_select(self):
+        print("難易度")
+        print("1: Easy")
+        print("2: Middle")
+        print("3: Difficult")
+        print("0: もどる")
+        diff = int(input("> "))
+        if diff == 0:
+            return -1
+        quests = self.cur.execute("SELECT id, name FROM quests_master WHERE difficulty=?", (diff, ))
+        for quest in quests:
+            print(*quest)
+        return int(input("> "))
+
+    def get_entity(self, idx):
+        quest = self.cur.execute("SELECT name, description, enemy_id, difficulty, money, rank_exp FROM quests_master WHERE id=?", (idx, )).fetchone()
+        return QuestEntity(*quest)
+
+
+class Enemy:
+    def __init__(self, cur, idx) -> None:
+        self.cur = cur
+        self.idx = idx
+
+    def get_status(self):
+        """name text,
+                hitpoint int,
+                strength int,
+                defence int,
+                magicpower int,
+                critical int,
+                exp int,"""
+
+        status = self.cur.execute(
+            "SELECT hitpoint, strength, defence, magicpower, critical FROM enemies_master WHERE id=?", (self.idx, )).fetchall()[0]
+        return status
+
+    def get_abilities(self):
+        abilities = self.cur.execute(
+            """
+            SELECT ability.name, ability.description, ability.count, ability.target, ability.type, ability.fixed_value, ability.value
+            FROM ability
+            JOIN (SELECT ability_id FROM enemies_master WHERE id=?) as em
+            WHERE ability.id=em.ability_id
+            """, (self.idx, )
+        ).fetchall()
+        for i, ability in enumerate(abilities):
+            abilities[i] = AbilityEntity(*ability)
+        return abilities
+
+    def get_exp(self):
+        exp = self.cur.execute("SELECT exp FROM enemies_master WHERE id=?", (self.idx,)).fetchone()[0]
+        return exp
+
+    def get_name(self):
+        return self.cur.execute("SELECT name FROM enemies_master WHERE id=?", (self.idx,)).fetchone()[0]
+
+    def get_entity(self):
+        entity = ActorEntity(*self.get_status())
+        entity.set_abilities(self.get_abilities())
+        return entity
 
 class EnemyFactory:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, cur) -> None:
+        self.cur = cur
+
+    def create(self, idx):
+        return Enemy(self.cur, idx)
 
 
 def main():
@@ -373,21 +506,39 @@ def main():
         player_factory = PlayerFactory(cur, PlayerDataBase)  # プレイヤーオブジェクトのファクトリークラス
         player = player_factory.create(1)  # プレイヤーオブジェクトを生成
         player.show_status()
-        player.set_rank_sql(1000)  # ランクEXPに加算
+        # player.add_rank_sql(1000)  # ランクEXPに加算
         # aplayer.set_class_id(2)
-        player.set_class_exp(1000)
-        player.show_status()
-        # player.rename()
+        player.add_class_exp(500)
         # player.show_status()
         player_entity = player.get_entity()
-        while True:
-            idx = player_entity.ability_select()
-            if idx < 0:
-                break
-            ability = player_entity.get_ability(idx)
-            quantity = player_entity.execute(idx)
-            print(ability.name, quantity)
-            break
+        quests = QuestsDataBase(cur)
+        quest_idx = quests.select()
+        quest = quests.get_entity(quest_idx)
+        enemy_idx = quest.enemy_id
+        enemy_factory = EnemyFactory(cur)
+        enemy = enemy_factory.create(enemy_idx)
+        enemy_entity = enemy.get_entity()
+        result = Battle(player_entity, enemy_entity).turn_clock()
+        if result == 0:
+            print("you lose")
+        elif result == 1:
+            old_level = player.get_level()
+            old_rank = player.get_rank()
+            player.add_class_exp(enemy.get_exp())
+            player.add_rank_sql(quest.rank_exp)
+            player.set_money(player.get_status()[0]+quest.money)
+            new_level = player.get_level()
+            new_rank = player.get_rank()
+            diff_level = new_level - old_level
+            diff_rank = new_rank - old_rank
+            if diff_level > 0:
+                print("Level Up!")
+            if diff_rank > 0:
+                print("Rank Up!")
+            print("you win")
+        elif result == -1:
+            print("撤退した")
+        player.show_status()
 
 
 if __name__ == "__main__":
