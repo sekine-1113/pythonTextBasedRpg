@@ -4,12 +4,12 @@ import random
 from sqlite3.dbapi2 import Connection, Cursor
 from pathlib import Path
 
-from settings import Singleton, mkdirs, DATABASE_DIR_PATH
-from utils.windows import Color, BackGroundColor, unlock_ansi
+from settings import Singleton, mkdirs, DATABASE_DIR_PATH, unlock_ansi, Color, BackGroundColor
 from battle_prototype import Battle
 
 
 class Input(Singleton):
+
     @classmethod
     def integer(self, prompt="> "):
         user_input = input(prompt)
