@@ -4,6 +4,36 @@ import os
 from ctypes import windll, wintypes, byref
 
 
+class Singleton:
+    def __new__(cls, *args, **kwargs) -> "Singleton":
+        if not hasattr(Singleton, "_instance"):
+            cls._instance = super(Singleton, cls).__new__(cls)
+        return cls._instance
+
+
+class Input(Singleton):
+
+    @classmethod
+    def integer(self, prompt:str="> ") -> int:
+        user_input = input(prompt)
+        try:
+            user_input = int(user_input)
+            return user_input
+        except ValueError:
+            return self.integer(prompt)
+
+    @classmethod
+    def integer_with_range(self, prompt:str="> ", _min:int=0, _max:int=0) -> int:
+        user_input = input(prompt)
+        try:
+            user_input = int(user_input)
+            if _min <= user_input <= _max:
+                return user_input
+            return self.integer_with_range(prompt, _min, _max)
+        except ValueError:
+            return self.integer_with_range(prompt, _min, _max)
+
+
 def unlock_ansi():
     # ANSIエスケープシーケンス解除
     STD_OUTPUT_HANDLE = -11
@@ -43,11 +73,6 @@ class BackGroundColor:
     N = "\033[48;5;{}m"
 
 
-class Singleton:
-    def __new__(cls, *args, **kwargs) -> "Singleton":
-        if not hasattr(Singleton, "_instance"):
-            cls._instance = super(Singleton, cls).__new__(cls)
-        return cls._instance
 
 
 def mkdirs(dirs_path) -> bool:
