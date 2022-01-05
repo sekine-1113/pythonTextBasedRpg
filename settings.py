@@ -74,6 +74,9 @@ class BackGroundColor:
 
 
 
+def exsits(path) -> bool:
+    return os.path.exists(path)
+
 
 def mkdirs(dirs_path) -> bool:
     if not os.path.exists(dirs_path):

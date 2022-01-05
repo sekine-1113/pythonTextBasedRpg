@@ -1,17 +1,18 @@
 
+from version7.actor import ActorEntity
+
+
 class Battle:
     def __init__(self, player, enemy) -> None:
-        self.turn = 0
-        self.player = player
-        self.enemy = enemy
+        self.player: ActorEntity = player
+        self.enemy: ActorEntity = enemy
 
     def turn_clock(self):
-        self.turn += 1
-        print(self.turn)
         player_action = self.player_turn()
         if player_action == -1:
             return -1
-
+        elif player_action == -2:
+            return self.turn_clock()
         if self.enemy.is_dead():
             return True
 
@@ -27,24 +28,30 @@ class Battle:
             return -1
         ability = self.player.get_ability(idx)
         quantity = self.player.execute(idx)
-        print(ability.name)
+        if quantity == -1:
+            return -2
         if ability.type_ == 0:
-            self.enemy.take_damage(quantity)
-            print("ダメージを与えた!")
+            damage = self.enemy.take_damage(quantity)
+            print(damage, "ダメージを与えた!")
         elif ability.type_ == 1:
-            self.player.take_heal(quantity)
-            print("回復した!")
+            heal = self.player.take_heal(quantity)
+            print(heal, "回復した!")
+        elif ability.type_ == 2:
+            damage = self.enemy.take_damage(quantity)
+            print(damage, "ダメージを与えた!")
         return 0
 
     def enemy_turn(self):
         ability = self.enemy.enemy_ai.select()
         idx = self.enemy.enemy_ai.get_index(ability)
         quantity = self.enemy.execute(idx)
-        print(ability.name)
         if ability.type_ == 0:
-            self.player.take_damage(quantity)
-            print("ダメージを受けた!")
+            damage = self.player.take_damage(quantity)
+            print(damage, "ダメージ受けた!")
         elif ability.type_ == 1:
-            self.enemy.take_heal(quantity)
-            print("回復した!")
+            heal = self.enemy.take_heal(quantity)
+            print(heal, "回復した!")
+        elif ability.type_ == 2:
+            damage = self.enemy.take_damage(quantity)
+            print(damage, "ダメージ受けた!")
         return 0

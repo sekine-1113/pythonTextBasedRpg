@@ -36,24 +36,28 @@ class ActorEntity:
     def execute(self, idx: int) -> int:
         ability: AbilityEntity = self.get_ability(idx)
         if not ability.can_use():
-            raise Exception("残り使用可能回数は0です.")
+            return -1
         ability.count -= 1
         critical = self.critical >= random.randint(0, 100) >= 0
         if critical:
             print("Critical!")
         if ability.type_ == 0:  # 攻撃
-            damage = ability.fixed_value + ability.value * self.strength
+            damage = ability.fixed_value + (ability.value/10) * self.strength
             damage += damage * 0.2 * critical
             return damage
         elif ability.type_ == 1:  # 回復
-            heal = ability.fixed_value + ability.value * self.magicpower
+            heal = ability.fixed_value + (ability.value/10) * self.magicpower
             heal += heal * 0.2 * critical
             return heal
+        elif ability.type_ == 2:
+            damage = ability.fixed_value + (ability.value/10) * self.strength
+            damage += damage * 0.2 * critical
+            return damage
         return 0
 
     def take_damage(self, damage: int) -> int:
-        self.hitpoint -= (damage - self.defence)
-        return (damage - self.defence)
+        self.hitpoint -= int(damage - self.defence/4)
+        return int(damage - self.defence/4)
 
     def take_heal(self, heal: int) -> int:
         if self.hitpoint + heal > self.max_hitpoint:

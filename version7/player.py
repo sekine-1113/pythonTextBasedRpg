@@ -94,9 +94,10 @@ class Player:
             SELECT ability.name, ability.description, ability.count, ability.target, ability.type, ability.fixed_value, ability.value
             FROM ability
             JOIN classes_ability_master
-            WHERE ability.id=classes_ability_master.ability_id
-            AND classes_ability_master.level<=?
-            """, (level,)
+            WHERE (ability.id=classes_ability_master.ability_id
+            AND (classes_ability_master.level<=?
+            AND classes_ability_master.id=?))
+            """, (level, self.get_class_id())
         ).fetchall()
         for i, ability in enumerate(abilities):
             abilities[i] = AbilityEntity(*ability)
@@ -115,11 +116,13 @@ class Player:
 
     def get_class_exp(self):
         class_id = self.get_class_id()
-        return self.cur.execute("SELECT * FROM player_classes_exp WHERE player_classes_exp.class_id=?", (class_id, )).fetchone()[0]
+        class_exp = self.cur.execute("SELECT class_exp FROM player_classes_exp WHERE player_classes_exp.id=? AND player_classes_exp.class_id=?", (self.idx, class_id, )).fetchone()
+        return class_exp[0]
 
     def add_class_exp(self, exp=0):
+        class_id = self.get_class_id()
         class_exp = int(self.get_class_exp()) + exp
-        self.cur.execute("UPDATE player_classes_exp SET class_exp=? WHERE id=?", (class_exp, self.idx))
+        self.cur.execute("UPDATE player_classes_exp SET class_exp=? WHERE id=? AND class_id=?", (class_exp, self.idx, class_id))
 
     def get_level(self):
         return self.cur.execute(
@@ -149,6 +152,7 @@ class Player:
         print("ゴールド:", self.get_status()[0])
         print("クラス:", self.get_class())
         print("レベル:", self.get_level())
+        print("EXP:", self.get_class_exp())
         print("ステータス")
         print("HP:", class_status[0])
         print("攻撃力:", class_status[1])
