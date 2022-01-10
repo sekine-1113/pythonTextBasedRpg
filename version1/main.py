@@ -6,6 +6,9 @@ class Player:
         self.money = money
         self.class_id = class_id
 
+    def dump(self):
+        return (self.idx, self.name, self.money, self.class_id)
+
     def __repr__(self) -> str:
         return f"[#{self.idx}] {self.name} {self.money}G (#{self.class_id})"
 
@@ -14,6 +17,9 @@ class Enemy:
         self.idx = idx
         self.name = name
         self.money = money
+
+    def dump(self):
+        return (self.idx, self.name, self.money)
 
     def __repr__(self) -> str:
         return f"[#{self.idx}] {self.name} {self.money}G"
@@ -35,4 +41,6 @@ player = player_factory.create()
 enemy_factory = ActorFactory(Enemy)
 enemy = enemy_factory.create()
 print(player)
+print(player.dump())
 print(enemy)
+print(enemy.dump())
