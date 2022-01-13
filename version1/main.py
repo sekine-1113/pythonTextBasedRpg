@@ -1,46 +1,56 @@
 
-class Player:
-    def __init__(self, idx, name, money, class_id) -> None:
-        self.idx = idx
+class Actor:
+    ability_list = []
+
+    def __init__(self, name, abilities=[], level=1) -> None:
         self.name = name
-        self.money = money
-        self.class_id = class_id
+        self.abilities: list = abilities
+        self.level = level
 
-    def dump(self):
-        return (self.idx, self.name, self.money, self.class_id)
+    def set_ability(self, ability):
+        if ability in self.abilities:
+            print(f"{ability}はすでに覚えています")
+            return
+        if ability not in self.ability_list:
+            print(f"{ability}は覚えられません")
+            return
+        self.abilities.append(ability)
+        if len(self.abilities) > 4:
+            del self.abilities[0]
 
-    def __repr__(self) -> str:
-        return f"[#{self.idx}] {self.name} {self.money}G (#{self.class_id})"
+    def set_default_ability(self):
+        for ability in self.ability_list:
+            if ability[0] <= self.level:
+                self.set_ability(ability)
+            else:
+                break
 
-class Enemy:
-    def __init__(self, idx, name, money) -> None:
-        self.idx = idx
-        self.name = name
-        self.money = money
-
-    def dump(self):
-        return (self.idx, self.name, self.money)
-
-    def __repr__(self) -> str:
-        return f"[#{self.idx}] {self.name} {self.money}G"
-
-
-class ActorFactory:
-    def __init__(self, actor_class) -> None:
-        self.actor_class = actor_class
-
-    def create(self):
-        if issubclass(self.actor_class, Player):
-            return self.actor_class(1, "アリス", 0, 1)
-        else:
-            return self.actor_class(1, "ゴブリン", 0)
+    def get_ability(self):
+        for ability in self.abilities:
+            print(ability[1], end=",")
+        print()
 
 
-player_factory = ActorFactory(Player)
-player = player_factory.create()
-enemy_factory = ActorFactory(Enemy)
-enemy = enemy_factory.create()
-print(player)
-print(player.dump())
-print(enemy)
-print(enemy.dump())
+class Player(Actor):
+    ability_list = [
+        [1, 'こうげき'],
+        [1, 'ぼうぎょ'],
+        [3, 'かいふく'],
+        [5, 'にげる']
+    ]
+
+    def __init__(self, name, abilities, level=1) -> None:
+        super().__init__(name, abilities, level)
+
+
+
+if __name__ == "__main__":
+    player = Player("アリス", [], 5)
+    player.set_default_ability()
+    player.get_ability()
+    player.set_ability('ねむる')
+    player.get_ability()
+    player.set_ability('にげる')
+    player.get_ability()
+    player.set_ability('にげる')
+    player.get_ability()
