@@ -1,5 +1,4 @@
 from ctypes import byref, windll, wintypes
-from datetime import datetime
 from logging import DEBUG, ERROR, Handler, NullHandler, StreamHandler, getLogger, Formatter
 
 
@@ -73,9 +72,12 @@ class MyLogger:
     def info(self):
         def wrapper(func):
             def inner(*args, **kwargs):
-                self._logger.info(func.__name__)
+                func_name = func.__name__
+                start_message = f"Start {func_name}"
+                self._logger.info(start_message)
                 _object = func(*args, **kwargs)
-                self._logger.info(func.__name__)
+                finish_message = f"Exit {func_name}"
+                self._logger.info(finish_message)
                 return _object
             return inner
         return wrapper
