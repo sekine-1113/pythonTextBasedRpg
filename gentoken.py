@@ -7,6 +7,7 @@ from getpass import getpass
 from hashlib import sha256
 
 
+
 def create_ntoken(n: int=16):
     """make N bits token.
 
@@ -86,3 +87,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
