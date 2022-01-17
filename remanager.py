@@ -2,16 +2,23 @@ import os
 
 
 class ResourceManager:
-    def __init__(self, current_dirctory=__file__) -> None:
-        if os.path.isfile(current_dirctory):
-            current_dirctory = os.path.dirname(current_dirctory)
-        self._curr_dir = current_dirctory
+    def __init__(self, abs_path=False) -> None:
+        self.__resources = {}
+        self._abs_path = abs_path
 
-    def path(self):
-        pass
+    def add(self, key, value):
+        self.__resources.setdefault(key, value)
 
-    def current(self):
-        return self._curr_dir
+    def get(self, key):
+        path = self.__resources.get(key)
+        if self._abs_path:
+            path = os.path.abspath(path)
+        return path
+
+    def show(self):
+        return self.__resources
 
 
-print(ResourceManager().current())
+resource = ResourceManager(True)
+resource.add("backup", "./backup")
+print(resource.get("backup"))
