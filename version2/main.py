@@ -12,20 +12,21 @@ class Ability:
         print("effect!")
 
 class IActor:
-    def __init__(self, name) -> None:
+    def __init__(self, name, abilities) -> None:
         self.name = name
+        self.abilities = abilities
 
     def __str__(self) -> str:
         return f"{self.name}"
 
 class Player(IActor):
-    def __init__(self, name, weapon) -> None:
-        super().__init__(name)
+    def __init__(self, name, abilities, weapon) -> None:
+        super().__init__(name, abilities)
         self.weapon = weapon
 
 class Enemy(IActor):
-    def __init__(self, name) -> None:
-        super().__init__(name)
+    def __init__(self, name, abilities) -> None:
+        super().__init__(name, abilities)
 
 
 class Engine:
@@ -42,7 +43,7 @@ class Engine:
         print(self.player)
 
 
-class BattleEngine:
+class Battle:
     def __init__(self, engine: Engine) -> None:
         self.engine = engine
 
@@ -54,4 +55,16 @@ class BattleEngine:
         self.engine.start()
 
 
-BattleEngine(Engine()).set_actor(Player("アリス", Weapon("ナイフ", 8)), Enemy("ゴブリン")).battle()
+Battle(
+    Engine()
+).set_actor(
+    Player(
+        "アリス",
+        [Ability()],
+        Weapon("ナイフ", 8)
+    ),
+    Enemy(
+        "ゴブリン",
+        [Ability()]
+    )
+).battle()
