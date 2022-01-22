@@ -73,6 +73,8 @@ class BackGroundColor:
     N = "\033[48;5;{}m"
 
 
+class PathManager:
+    pass
 
 def exsits(path) -> bool:
     return os.path.exists(path)
