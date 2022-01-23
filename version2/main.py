@@ -41,6 +41,7 @@ class Engine:
     def start(self):
         print("start")
         print(self.player)
+        return 0
 
 
 class Battle:
@@ -53,6 +54,8 @@ class Battle:
 
     def battle(self):
         self.engine.start()
+        return 0
+
 
 
 Battle(
