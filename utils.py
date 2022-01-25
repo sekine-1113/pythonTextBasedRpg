@@ -48,6 +48,9 @@ class ColorStream:
     def normal(self, message):
         return message
 
+    def blue(self, message):
+        return self.Color.BLUE + message + self.Color.RESET
+
 
 class MyLogger:
     def __init__(self, _name, _logger_level=DEBUG, _handlers=None):
@@ -90,7 +93,10 @@ logger = MyLogger(__name__, DEBUG, {StreamHandler: {"level":DEBUG}})
 
 @logger.info()
 def func(*args):
-    print("Hello")
+    stream = ColorStream()
+
+    print(stream.red("Hello"))
+    print(stream.blue("world"))
     return 0
 
 if __name__ == "__main__":
