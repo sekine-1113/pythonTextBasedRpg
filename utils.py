@@ -95,8 +95,8 @@ logger = MyLogger(__name__, DEBUG, {StreamHandler: {"level":DEBUG}})
 def func(*args):
     stream = ColorStream()
 
-    print(stream.red("Hello"))
-    print(stream.blue("world"))
+    print(stream.red("Hello"), stream.blue("world"))
+    print(stream.normal("Normal!"))
     return 0
 
 if __name__ == "__main__":
