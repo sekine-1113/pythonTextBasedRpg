@@ -42,8 +42,10 @@ class ColorStream:
         dwMode.value |= ENABLE_VIRTUAL_TERMINAL_PROCESSING
         kernel32.SetConsoleMode(hOut, dwMode)
 
-    def red(self, message):
-        return self.Color.RED + message + self.Color.RESET
+    def red(self, message, bg=None):
+        message = self.Color.RED + message + self.Color.RESET
+        message = bg + message + self.BackGroundColor.RESET
+        return message
 
     def normal(self, message):
         return message
@@ -76,7 +78,7 @@ class MyLogger:
         def wrapper(func):
             def inner(*args, **kwargs):
                 func_name = func.__name__
-                start_message = f"Start {func_name}"
+                start_message = f"Call {func_name}"
                 self._logger.info(start_message)
                 _object = func(*args, **kwargs)
                 finish_message = f"Exit {func_name}"
@@ -93,10 +95,10 @@ logger = MyLogger(__name__, DEBUG, {StreamHandler: {"level":DEBUG}})
 
 @logger.info()
 def func(*args):
-    stream = ColorStream()
+    font = ColorStream()
 
-    print(stream.red("Hello"), stream.blue("world"))
-    print(stream.normal("Normal!"))
+    print(font.red("Hello", bg=font.BackGroundColor.CIAN), font.blue("world"))
+    print(font.normal("Normal!"))
     return 0
 
 if __name__ == "__main__":
