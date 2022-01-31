@@ -4,16 +4,11 @@ import os
 from ctypes import windll, wintypes, byref
 
 
-class Singleton:
-    def __new__(cls, *args, **kwargs) -> "Singleton":
-        if not hasattr(Singleton, "_instance"):
-            cls._instance = super(Singleton, cls).__new__(cls)
-        return cls._instance
 
+class Input:
+    def __init__(self) -> None:
+        super().__init__()
 
-class Input(Singleton):
-
-    @classmethod
     def integer(self, prompt:str="> ") -> int:
         user_input = input(prompt)
         try:
@@ -22,7 +17,6 @@ class Input(Singleton):
         except ValueError:
             return self.integer(prompt)
 
-    @classmethod
     def integer_with_range(self, prompt:str="> ", _min:int=0, _max:int=0) -> int:
         user_input = input(prompt)
         try:
@@ -34,47 +28,6 @@ class Input(Singleton):
             return self.integer_with_range(prompt, _min, _max)
 
 
-def unlock_ansi():
-    # ANSIエスケープシーケンス解除
-    STD_OUTPUT_HANDLE = -11
-    ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
-
-    kernel32 = windll.kernel32
-    hOut = kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
-    dwMode = wintypes.DWORD()
-    kernel32.GetConsoleMode(hOut, byref(dwMode))
-    dwMode.value |= ENABLE_VIRTUAL_TERMINAL_PROCESSING
-    kernel32.SetConsoleMode(hOut, dwMode)
-
-
-class Color:
-    BLACK = "\033[30m"
-    RED = "\033[31m"
-    GREEN = "\033[32m"
-    YELLO = "\033[33m"
-    BLUE = "\033[34m"
-    MAZENTA = "\033[35m"
-    CIAN = "\033[36m"
-    WHITE = "\033[37m"
-    RESET = "\033[0m"
-    N = "\033[38;5;{}m"
-
-
-class BackGroundColor:
-    BLACK = "\033[40m"
-    RED = "\033[41m"
-    GREEN = "\033[42m"
-    YELLO = "\033[43m"
-    BLUE = "\033[44m"
-    MAZENTA = "\033[45m"
-    CIAN = "\033[46m"
-    WHITE = "\033[47m"
-    RESET = "\033[0m"
-    N = "\033[48;5;{}m"
-
-
-class PathManager:
-    pass
 
 def exsits(path) -> bool:
     return os.path.exists(path)
@@ -112,3 +65,9 @@ MASTER_DATA_PATHES = [
 CONFIG_FILE_NAME = "config.json"
 CONFIG_FILE_PATH = os.path.abspath(
     os.path.join(DIR, CONFIG_FILE_NAME))
+
+
+
+if __name__ == "__main__":
+    input_ = Input()
+    input_.integer_with_range(_max=3)

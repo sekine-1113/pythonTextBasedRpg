@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 
+
 layout = [
     [sg.T("Attack(A):"), sg.I(key="-A-")],
     [sg.T("Defence(D):"), sg.I(key="-D-")],
@@ -17,10 +18,12 @@ while True:
 
     A = int(values["-A-"])
     D = int(values["-D-"])
-    if D == 0:
+    try:
+        expr = int(eval(values["-E-"]))
+        window["-out-"].update(str(expr))
+    except ZeroDivisionError:
         D += 1
-
-    expr = int(eval(values["-E-"]))
-    window["-out-"].update(str(expr))
+        expr = int(eval(values["-E-"]))
+        window["-out-"].update(str(expr))
 
 window.close()

@@ -53,6 +53,9 @@ class ColorStream:
     def blue(self, message):
         return self.Color.BLUE + message + self.Color.RESET
 
+    def color(self, message, n=251):
+        return self.Color.N.format(n) + message + self.Color.RESET
+
 
 class MyLogger:
     def __init__(self, _name, _logger_level=DEBUG, _handlers=None):
@@ -91,14 +94,15 @@ class MyLogger:
         return self._logger
 
 
-logger = MyLogger(__name__, DEBUG, {StreamHandler: {"level":DEBUG}})
+logger = MyLogger(__name__, DEBUG, {StreamHandler: {"level":DEBUG}}).getLogger()
 
-@logger.info()
 def func(*args):
+    logger.debug("Start")
     font = ColorStream()
-
     print(font.red("Hello", bg=font.BackGroundColor.CIAN), font.blue("world"))
+    print(font.color("HelloWorld!"))
     print(font.normal("Normal!"))
+    logger.debug("Exit")
     return 0
 
 if __name__ == "__main__":
