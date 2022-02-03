@@ -2,6 +2,6 @@ __pycache__
 */build
 */dist
 */*.spec
-old/*/build
-old/*/dist
-old/*/*.spec
+*/*/build
+*/*/dist
+*/*/*.spec
