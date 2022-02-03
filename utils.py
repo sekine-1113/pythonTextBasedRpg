@@ -1,5 +1,29 @@
 from ctypes import byref, windll, wintypes
 from logging import DEBUG, ERROR, Handler, NullHandler, StreamHandler, getLogger, Formatter
+import sys
+
+
+class Input:
+    def __init__(self) -> None:
+        super().__init__()
+
+    def integer(self, prompt:str="> ") -> int:
+        user_input = input(prompt)
+        try:
+            user_input = int(user_input)
+            return user_input
+        except ValueError:
+            return self.integer(prompt)
+
+    def integer_with_range(self, prompt:str="> ", _min:int=0, _max:int=0) -> int:
+        user_input = input(prompt)
+        try:
+            user_input = int(user_input)
+            if _min <= user_input <= _max:
+                return user_input
+            return self.integer_with_range(prompt, _min, _max)
+        except ValueError:
+            return self.integer_with_range(prompt, _min, _max)
 
 
 class ColorStream:
@@ -31,7 +55,6 @@ class ColorStream:
         self.unlock()
 
     def unlock(self):
-        # ANSIエスケープシーケンス解除
         STD_OUTPUT_HANDLE = -11
         ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
 
@@ -53,7 +76,7 @@ class ColorStream:
     def blue(self, message):
         return self.Color.BLUE + message + self.Color.RESET
 
-    def color(self, message, n=251):
+    def color(self, message, n="0;0;255"):
         return self.Color.N.format(n) + message + self.Color.RESET
 
 
@@ -96,8 +119,9 @@ class MyLogger:
 
 logger = MyLogger(__name__, DEBUG, {StreamHandler: {"level":DEBUG}}).getLogger()
 
+
 def func(*args):
-    logger.debug("Start")
+    logger.debug(f"Start {args=}")
     font = ColorStream()
     print(font.red("Hello", bg=font.BackGroundColor.CIAN), font.blue("world"))
     print(font.color("HelloWorld!"))
@@ -106,4 +130,4 @@ def func(*args):
     return 0
 
 if __name__ == "__main__":
-    func("mypy")
+    func("mypy", "hello")

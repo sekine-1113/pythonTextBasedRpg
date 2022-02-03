@@ -30,7 +30,7 @@ def create_id():
     return user_id
 
 
-def create_password(n: int=4):
+def get_password(n: int=4):
     password = ""
     while len(password) < n:
         password = getpass()
@@ -54,8 +54,7 @@ def confirm_password(hashed_path):
 
 
 def main():
-    pwd, hpwd = create_random_password()
-    print(pwd)
+    hpwd = get_password()
     print(confirm_password(hpwd))
 
 
