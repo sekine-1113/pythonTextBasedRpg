@@ -3,29 +3,6 @@ from logging import DEBUG, ERROR, Handler, NullHandler, StreamHandler, getLogger
 import sys
 
 
-class Input:
-    def __init__(self) -> None:
-        super().__init__()
-
-    def integer(self, prompt:str="> ") -> int:
-        user_input = input(prompt)
-        try:
-            user_input = int(user_input)
-            return user_input
-        except ValueError:
-            return self.integer(prompt)
-
-    def integer_with_range(self, prompt:str="> ", _min:int=0, _max:int=0) -> int:
-        user_input = input(prompt)
-        try:
-            user_input = int(user_input)
-            if _min <= user_input <= _max:
-                return user_input
-            return self.integer_with_range(prompt, _min, _max)
-        except ValueError:
-            return self.integer_with_range(prompt, _min, _max)
-
-
 class ColorStream:
     class Color:
         BLACK = "\033[30m"
