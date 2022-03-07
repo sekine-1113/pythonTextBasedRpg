@@ -18,13 +18,10 @@ class ConstDict:
     def get(self, __k):
         return self.__getitem__(__k)
 
-CONFIG = ConstDict({
-    "hoge": "hogehoge"
-})
 
-# CONFIG = ConstDict({
-#     "GameTitle": "SimpleRPG"
-# })
+CONFIG = ConstDict({
+    "GameTitle": "SimpleRPG"
+})
 
 
 class Actor:
@@ -43,8 +40,22 @@ class Actor:
             print(f"EXP: {self.exp:3}")
 
 
+class GlobalData:
+    __instance = None
+    def __new__(cls, *args, **kwargs):
+        if not cls.__instance:
+            cls.__instance = super(GlobalData, cls).__new__(cls)
+        return cls.__instance
+
+    def __init__(self, player=None) -> None:
+        self.player = player
+
+
 def main():
+
+
     player = Actor("Player", 30, 8, 0, True)
+    data = GlobalData(player)
     enemy = Actor("Enemy", 24, 6, 4, False)
 
     print(f"Welcom to {CONFIG['GameTitle']}!")
