@@ -19,14 +19,20 @@ class Actor:
         return self.name
 
 
+class TEXT:
+    TITLE = "Welcome to SimpleRPG!"
+    TITLE_MENU = "[1]Start [0]Exit > "
+    EXIT = "Bye! see you next time!"
+
+
 def main():
     player = Actor("Player", 30, 8, 0, True)
     enemy = Actor("Enemy", 24, 6, 4, False)
-    print("Welcom to SimpleRPG!")
-    gameloop = input("[1] Start [0] Exit > ")
+    print(TEXT.TITLE)
+    gameloop = input(TEXT.TITLE_MENU)
 
     if (not gameloop):
-        print("Bye!")
+        print(TEXT.EXIT)
         return
 
     player.show()
