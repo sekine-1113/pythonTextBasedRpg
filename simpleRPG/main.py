@@ -25,6 +25,12 @@ class TEXT:
     EXIT = "Bye! see you next time!"
 
 
+def battle(player: Actor, enemy: Actor):
+    print(f"Player: {player.name}")
+    print(f"Enemy: {enemy.name}")
+
+    return 0
+
 def main():
     player = Actor("Player", 30, 8, 0, True)
     enemy = Actor("Enemy", 24, 6, 4, False)
@@ -37,6 +43,8 @@ def main():
 
     player.show()
     enemy.show()
+
+    battle(player, enemy)
 
 
 main()
