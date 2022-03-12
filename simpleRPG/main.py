@@ -29,6 +29,10 @@ def battle(player: Actor, enemy: Actor):
     print(f"Player: {player.name}")
     print(f"Enemy: {enemy.name}")
 
+    print("Finish")
+
+    print(f"Winner: {player.name}")
+
     return 0
 
 def main():
