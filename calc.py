@@ -2,9 +2,9 @@ import PySimpleGUI as sg
 
 
 layout = [
-    [sg.T("Attack(A):"), sg.I(key="-A-")],
-    [sg.T("Defence(D):"), sg.I(key="-D-")],
-    [sg.T("EXPR:"), sg.I(key="-E-")],
+    [sg.T("Attack(A):"), sg.I(key="-A-")],  # 攻撃力
+    [sg.T("Defence(D):"), sg.I(key="-D-")],  # 防御力
+    [sg.T("EXPR:"), sg.I(key="-E-")],  # 計算式
     [sg.T("RESULT:"), sg.T(size=(55, 1), key="-out-")],
     [sg.B("Calc"), sg.B("Exit")]
 ]

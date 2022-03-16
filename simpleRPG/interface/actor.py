@@ -1,4 +1,8 @@
-from simpleRPG.interface import ABC, abstractmethod, random
+from simpleRPG.interface import (
+    ABC,
+    abstractmethod,
+    random
+)
 from simpleRPG.interface.status import IStatus
 
 

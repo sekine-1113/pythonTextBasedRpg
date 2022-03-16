@@ -1,4 +1,7 @@
-from simpleRPG.interface import ABC, abstractmethod
+from simpleRPG.interface import (
+    ABC,
+    abstractmethod,
+)
 
 
 class IStatus(ABC):

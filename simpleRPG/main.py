@@ -1,5 +1,9 @@
 from copy import deepcopy
 
+# from simpleRPG import (
+#     os,
+#     sys,
+# )
 from simpleRPG.interface import (
     no_random,
     random,
@@ -12,6 +16,10 @@ from simpleRPG.io import (
     integer_within_array,
     integer_within_range,
     output,
+)
+from simpleRPG.io.file import (
+    get_path,
+    load
 )
 
 
@@ -137,6 +145,7 @@ class Player(IActor):
             f"  ATK: {self.status.ATK} + {self.weapon.ATK}"
         )
         output(status)
+        #buff.add_message(Message(status))
 
     def __repr__(self) -> str:
         return (
