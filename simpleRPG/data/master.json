@@ -1,0 +1,27 @@
+{
+    "enemies": [
+        {
+            "id": 0,
+            "name": "Slime",
+            "status": {
+                "level": 2,
+                "HP": 24,
+                "ATK": 8,
+                "DEF": 6,
+                "EXP": 4
+            }
+        },
+        {
+            "id": 1,
+            "name": "Goblin",
+            "status": {
+                "level": 4,
+                "HP": 36,
+                "ATK": 12,
+                "DEF": 8,
+                "EXP": 6
+            }
+        }
+
+    ]
+}

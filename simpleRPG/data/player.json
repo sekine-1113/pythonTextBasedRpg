@@ -1,0 +1,26 @@
+{
+    "players": [
+        {
+            "name": "Alice",
+            "status": {
+                "level": 1,
+                "HP": 32,
+                "ATK": 12,
+                "DEF": 8,
+                "EXP": 0
+            },
+            "money": 0
+        },
+        {
+            "name": "Bob",
+            "status": {
+                "level": 2,
+                "HP": 36,
+                "ATK": 14,
+                "DEF": 12,
+                "EXP": 0
+            },
+            "money": 0
+        }
+    ]
+}

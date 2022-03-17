@@ -8,9 +8,10 @@ from simpleRPG.interface.status import IStatus
 
 class IActor(ABC):
 
-    def __init__(self, name: str, status: IStatus, random_function: random.randint=random.randint) -> None:
+    def __init__(self, name: str, status: IStatus, money: int, random_function: random.randint=random.randint) -> None:
         self.name = name
         self.status = status
+        self.money = money
         self._random = random_function
 
     @abstractmethod

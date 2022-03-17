@@ -1,6 +1,7 @@
 import json
 
 
+
 def integer(prompt:str="> ") -> int:
     user_input = input(prompt)
     try:
@@ -8,7 +9,3 @@ def integer(prompt:str="> ") -> int:
         return user_input
     except ValueError as e:
         return integer(prompt)
-
-
-def output(*args, **kwargs) -> None:
-    print(*args, **kwargs)
