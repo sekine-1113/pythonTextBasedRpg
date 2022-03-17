@@ -1,6 +1,7 @@
 import os
-import sys
 import random
+import sys
+from copy import deepcopy
 
 
 def no_random(*args) -> int:

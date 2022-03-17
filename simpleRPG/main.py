@@ -1,10 +1,8 @@
-from copy import deepcopy
 
-# from simpleRPG import (
-#     os,
-#     sys,
-# )
 from simpleRPG import (
+    os,
+    sys,
+    deepcopy,
     no_random,
     random,
 )
@@ -14,10 +12,6 @@ from simpleRPG.interface.weapon import IWeapon
 from simpleRPG.io import (
     integer,
     output,
-)
-from simpleRPG.io.color import (
-    Color,
-    BackGroundColor,
 )
 from simpleRPG.io.file import (
     get_path,
@@ -77,7 +71,13 @@ class Weapon(IWeapon):
 
 class Player(IActor):
 
-    def __init__(self, name: str, status: PlayerStatus, weapon: IWeapon=None, random_function: random.randint=random.randint) -> None:
+    def __init__(
+            self,
+            name: str,
+            status: PlayerStatus,
+            weapon: IWeapon=None,
+            random_function: random.randint=random.randint
+        ) -> None:
         super().__init__(
             name,
             status,
