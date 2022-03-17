@@ -13,9 +13,11 @@ from simpleRPG.interface.status import IStatus
 from simpleRPG.interface.weapon import IWeapon
 from simpleRPG.io import (
     integer,
-    integer_within_array,
-    integer_within_range,
     output,
+)
+from simpleRPG.io.color import (
+    Color,
+    BackGroundColor,
 )
 from simpleRPG.io.file import (
     get_path,
