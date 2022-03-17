@@ -4,7 +4,7 @@ from copy import deepcopy
 #     os,
 #     sys,
 # )
-from simpleRPG.interface import (
+from simpleRPG import (
     no_random,
     random,
 )
@@ -145,7 +145,6 @@ class Player(IActor):
             f"  ATK: {self.status.ATK} + {self.weapon.ATK}"
         )
         output(status)
-        #buff.add_message(Message(status))
 
     def __repr__(self) -> str:
         return (
