@@ -1,0 +1,20 @@
+{
+    "players": [
+        {
+            "id": 0,
+            "name": "peach"
+        },
+        {
+            "id": 1,
+            "name": "jack"
+        },
+        {
+            "id": 2,
+            "name": "bob"
+        },
+        {
+            "id": 3,
+            "name": "bes"
+        }
+    ]
+}
