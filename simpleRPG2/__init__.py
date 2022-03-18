@@ -6,8 +6,10 @@ from abc import (
     ABC,
     abstractmethod,
 )
-from copy import deepcopy
-
+from copy import (
+    copy,
+    deepcopy
+)
 
 
 def integer(prompt:str="> ") -> int:
