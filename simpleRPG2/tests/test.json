@@ -1,0 +1,8 @@
+{
+    "name": "alice",
+    "status": {
+        "hitpoint": 32,
+        "strength": 8,
+        "defence": 6
+    }
+}

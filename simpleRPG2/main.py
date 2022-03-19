@@ -34,15 +34,15 @@ def test_player_manager():
 
     class PlayerManager:
         def __init__(self, players: list) -> None:
-            self.__players = players
+            self.players = players
 
         def get(self, _id: int) -> dict|None:
-            for player in self.__players:
+            for player in self.players:
                 if player.get("id") == _id:
                     return player
 
         def add(self, player: dict) -> None:
-            self.__players.append(player)
+            self.players.append(player)
 
         def get_usable_ids(self) -> list[int]:
             i: int
@@ -69,24 +69,24 @@ def test_player_manager():
 
         def dumps(self) -> None:
             player: dict
-            for player in self.__players:
+            for player in self.players:
                 print(player)
 
         def size(self) -> int:
-            return len(self.__players)
+            return len(self.players)
 
         def clear(self) -> None:
-            self.__players = []
+            self.players = []
 
         def sort(self) -> None:
-            self.__players.sort(key=lambda x: x["id"])
+            self.players.sort(key=lambda x: x["id"])
 
-        def output(self) -> dict:
-            return {"players": self.__players}
+        def tojson(self) -> dict:
+            return self.__dict__
 
 
     player_manager = PlayerManager(save.get("players"))
-    print(f"{player_manager.output()=}")
+    print(f"{player_manager.tojson()=}")
     player_manager.clear()
     if (0 == player_manager.size()):
         player_manager.make("peach")
@@ -98,7 +98,7 @@ def test_player_manager():
     player_manager.sort()
     player_manager.dumps()
 
-    print(f"{player_manager.output()=}")
+    print(f"{player_manager.tojson()=}")
 
 
     class FileManager:
