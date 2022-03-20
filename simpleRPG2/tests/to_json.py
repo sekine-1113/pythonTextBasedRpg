@@ -55,8 +55,7 @@ class tojson:
     def _fromlist(cls, value):
         cp = copy(value)
         for i, item in enumerate(cp):
-            func = cls._funcs.get(item.__class__,
-            cls._fromclass)
+            func = cls._funcs.get(item.__class__, cls._fromclass)
             cp[i] = func(item)
         return cp
 
@@ -68,9 +67,7 @@ class tojson:
     def _fromdict(cls, value):
         cp = copy(value)
         for varname, val in cp.items():
-            func = cls._funcs.get(
-                val.__class__,
-                cls._fromclass)
+            func = cls._funcs.get(val.__class__, cls._fromclass)
             cp[varname] = func(val)
         return cp
 
