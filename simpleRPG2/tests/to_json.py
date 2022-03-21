@@ -24,6 +24,7 @@ class tojson:
         }
 
         class_vars = copy(_class.__dict__)
+        varname: str
         for varname, value in class_vars.items():
             if value.__class__ in cls.unsupported:
                 continue
@@ -31,7 +32,7 @@ class tojson:
                 func = cls._funcs.get(value.__class__, cls._fromclass)
                 value = func(value)
             class_vars[varname] = value
-        if include_class_name:
+        if include_class_name and not hasattr(_class, "_ignore"):
             class_vars = {_class.__class__.__name__: class_vars}
         return json.loads(json.dumps(class_vars))
 
@@ -55,6 +56,8 @@ class tojson:
     def _fromlist(cls, value):
         cp = copy(value)
         for i, item in enumerate(cp):
+            if item.__class__ in cls.unsupported:
+                continue
             func = cls._funcs.get(item.__class__, cls._fromclass)
             cp[i] = func(item)
         return cp
@@ -67,6 +70,8 @@ class tojson:
     def _fromdict(cls, value):
         cp = copy(value)
         for varname, val in cp.items():
+            if val.__class__ in cls.unsupported:
+                continue
             func = cls._funcs.get(val.__class__, cls._fromclass)
             cp[varname] = func(val)
         return cp
@@ -95,6 +100,8 @@ class Users:
     def __init__(self, users: list[User]) -> None:
         self.data = users
 
+def save(json_str):
+    print(json_str)
 
 print(
     json.dumps(
