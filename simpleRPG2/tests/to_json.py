@@ -11,7 +11,7 @@ class tojson:
         range
     )
 
-    def __new__(cls, _class, include_class_name=True) -> dict:
+    def __new__(cls, _class, include_class_name=False) -> dict:
         cls._funcs = {
             int: cls._fromint,
             float: cls._fromfloat,
@@ -32,7 +32,7 @@ class tojson:
                 func = cls._funcs.get(value.__class__, cls._fromclass)
                 value = func(value)
             class_vars[varname] = value
-        if include_class_name and not hasattr(_class, "_ignore"):
+        if include_class_name or hasattr(_class, "_include"):
             class_vars = {_class.__class__.__name__: class_vars}
         return json.loads(json.dumps(class_vars))
 
@@ -83,6 +83,11 @@ class tojson:
     @classmethod
     def _fromset(cls, value):
         return cls._fromlist(list(value))
+
+class IncludeClassName:
+    def __new__(cls, _class):
+        setattr(_class, "_include", True)
+        return _class
 
 
 class Item:
