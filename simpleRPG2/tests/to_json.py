@@ -103,23 +103,24 @@ class User:
 
 class Users:
     def __init__(self, users: list[User]) -> None:
-        self.data = users
+        self.users = users
 
-def save(json_str):
-    print(json_str)
+def save(json_str, file, encoding="UTF-8"):
+    with open(file, "w", encoding=encoding) as f:
+        json.dump(json_str, f, indent=4)
 
-print(
-    json.dumps(
-        tojson(
-            Users(
-                users=[
-                    User(name="Alice", age=27, items=[Item(name="iPhone12")]),
-                    User(name="Bob", age=30, items=[Item(name="iPhone8"),Item(name="iPhone10")])
-                ]
-            )
-        ),
-    )
+save(
+    tojson(
+        Users(
+            users=[
+                User(name="Alice", age=27, items=[Item(name="iPhone12")]),
+                User(name="Bob", age=30, items=[Item(name="iPhone8"),Item(name="iPhone10")])
+            ]
+        )
+    ),
+    r"simpleRPG2\tests\test.json"
 )
+
 
 """
 {"Users":

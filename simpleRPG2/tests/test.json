@@ -1,8 +1,25 @@
 {
-    "name": "alice",
-    "status": {
-        "hitpoint": 32,
-        "strength": 8,
-        "defence": 6
-    }
+    "users": [
+        {
+            "name": "Alice",
+            "age": 27,
+            "items": [
+                {
+                    "name": "iPhone12"
+                }
+            ]
+        },
+        {
+            "name": "Bob",
+            "age": 30,
+            "items": [
+                {
+                    "name": "iPhone8"
+                },
+                {
+                    "name": "iPhone10"
+                }
+            ]
+        }
+    ]
 }
