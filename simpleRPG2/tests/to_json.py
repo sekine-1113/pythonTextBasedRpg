@@ -8,10 +8,10 @@ class tojson:
         bytes,
         bytearray,
         memoryview,
-        range
+        range,
     )
 
-    def __new__(cls, _class, include_class_name=False) -> dict:
+    def __new__(cls, _class) -> dict:
         cls._funcs = {
             int: cls._fromint,
             float: cls._fromfloat,
@@ -32,28 +32,26 @@ class tojson:
                 func = cls._funcs.get(value.__class__, cls._fromclass)
                 value = func(value)
             class_vars[varname] = value
-        if include_class_name or hasattr(_class, "_include"):
-            class_vars = {_class.__class__.__name__: class_vars}
         return json.loads(json.dumps(class_vars))
 
     @classmethod
-    def _fromint(cls, value):
+    def _fromint(cls, value: int) -> int:
         return value
 
     @classmethod
-    def _fromfloat(cls,value):
+    def _fromfloat(cls, value: float) -> float:
         return value
 
     @classmethod
-    def _fromstr(cls,value):
+    def _fromstr(cls, value: str) -> str:
         return value
 
     @classmethod
-    def _frombool(cls,value):
+    def _frombool(cls, value: bool) -> bool:
         return value
 
     @classmethod
-    def _fromlist(cls, value):
+    def _fromlist(cls, value: list) -> list:
         cp = copy(value)
         for i, item in enumerate(cp):
             if item.__class__ in cls.unsupported:
@@ -63,11 +61,11 @@ class tojson:
         return cp
 
     @classmethod
-    def _fromtuple(cls,value):
+    def _fromtuple(cls, value: tuple) -> list:
         return cls._fromlist(list(value))
 
     @classmethod
-    def _fromdict(cls, value):
+    def _fromdict(cls, value: dict) -> dict:
         cp = copy(value)
         for varname, val in cp.items():
             if val.__class__ in cls.unsupported:
@@ -77,17 +75,12 @@ class tojson:
         return cp
 
     @classmethod
-    def _fromclass(cls, value):
+    def _fromclass(cls, value: object) -> dict:
         return cls.__new__(cls, value)
 
     @classmethod
-    def _fromset(cls, value):
+    def _fromset(cls, value: set) -> list:
         return cls._fromlist(list(value))
-
-class IncludeClassName:
-    def __new__(cls, _class):
-        setattr(_class, "_include", True)
-        return _class
 
 
 class Item:
@@ -104,6 +97,11 @@ class User:
 class Users:
     def __init__(self, users: list[User]) -> None:
         self.users = users
+
+    def load(self, json_str: str) -> None:
+        for user in json_str['users']:
+            self.users.append(User(user['name'], user['age'], [Item(item['name']) for item in user['items']]))
+        return self
 
 def save(json_str: str, file: str, encoding: str="UTF-8"):
     with open(file, "w", encoding=encoding) as f:
@@ -127,12 +125,7 @@ json_str = tojson(
 )
 
 save(json_str, file)
-load_json_str = load(file)
-users = []
-for user in load_json_str['users']:
-    users.append(User(user['name'], user['age'], [Item(item['name']) for item in user['items']]))
-
-print(f"{json_str == tojson(Users(users)) = }")
+print(f"{json_str == tojson(Users([]).load(load(file))) = }")
 """
 {"Users": [
         {"User": {"name": "Alice", "age": 27, "items": [{"Item": {"name": "iPhone12"}}]}},
