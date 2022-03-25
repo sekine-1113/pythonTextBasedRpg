@@ -9,7 +9,9 @@ from simpleRPG2 import (
     integer,
 )
 
-import json
+from simpleRPG2.tests import (
+    jsonconverter
+)
 
 
 
@@ -32,16 +34,25 @@ def test_player_manager():
         ]
     }
 
+    class Player:
+        def __init__(self, player_id, name) -> None:
+            self.id = player_id
+            self.name = name
+
+        def __repr__(self) -> str:
+            return f"{self.id} {self.name}"
+
     class PlayerManager:
-        def __init__(self, players: list) -> None:
+        def __init__(self, players: list[Player]) -> None:
             self.players = players
 
         def get(self, _id: int) -> dict|None:
+            player: Player
             for player in self.players:
-                if player.get("id") == _id:
+                if player.id == _id:
                     return player
 
-        def add(self, player: dict) -> None:
+        def add(self, player: Player) -> None:
             self.players.append(player)
 
         def get_usable_ids(self) -> list[int]:
@@ -55,20 +66,14 @@ def test_player_manager():
         def make(self, name: str, _id: int=None) -> None:
             usable_ids: list[int] = self.get_usable_ids()
             if _id is not None and _id in usable_ids:
-                self.add({
-                    "id": _id,
-                    "name": name
-                })
+                self.add(Player(_id, name))
                 return
 
             char_id: int = min(usable_ids)
-            self.add({
-                "id": char_id,
-                "name": name
-            })
+            self.add(Player(char_id, name))
 
         def dumps(self) -> None:
-            player: dict
+            player: Player
             for player in self.players:
                 print(player)
 
@@ -79,43 +84,33 @@ def test_player_manager():
             self.players = []
 
         def sort(self) -> None:
-            self.players.sort(key=lambda x: x["id"])
+            self.players.sort(key=lambda x: x.id)
 
         def tojson(self) -> dict:
-            return self.__dict__
+            return jsonconverter.tojson(self)
 
 
-    player_manager = PlayerManager(save.get("players"))
+
+    players = []
+    for player in save.get("players"):
+        players.append(Player(player_id=player.get("id"), name=player.get("name")))
+    player_manager = PlayerManager(players)
     print(f"{player_manager.tojson()=}")
     player_manager.clear()
     if (0 == player_manager.size()):
         player_manager.make("peach")
-    player_manager.add({"id": 5, "name":"mike"})
+    player_manager.add(Player(5, "alice"))
     player_manager.make("jack")
     player_manager.make("bob")
     player_manager.make("wendy", 1)
     print(f"{player_manager.get(3)=}")
     player_manager.sort()
-    player_manager.dumps()
 
     print(f"{player_manager.tojson()=}")
 
+    save["players"] = player_manager.tojson()
+    print(save["players"])
 
-    class FileManager:
-        def __init__(self, base_dir=""):
-            self._base_dir = base_dir
-
-        def load(self, path: str) -> dict:
-            file = os.path.join(
-                self._base_dir,
-                path)
-            with open(file, "r", encoding="UTF-8") as f:
-                return json.load(f)
-
-        def save(self, path: str, data: object) -> None:
-            file: str = os.path.join(self._base_dir, path)
-            with open(file, "w", encoding="UTF-8") as f:
-                json.dump(data, f, indent=4)
 
 
     # fm = FileManager("./simpleRPG2")

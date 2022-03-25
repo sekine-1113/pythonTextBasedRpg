@@ -113,23 +113,24 @@ def load(file, encoding: str="UTF-8"):
         return json.load(f)
 
 
-file = r"simpleRPG2\tests\test.json"
+if __name__ == "__main__":
+    file = r"simpleRPG2\tests\test.json"
 
-json_str = tojson(
-    Users(
-        users=[
-            User(name="Alice", age=27, items=[Item(name="iPhone12")]),
-            User(name="Bob", age=30, items=[Item(name="iPhone8"),Item(name="iPhone10")])
-        ]
+    json_str = tojson(
+        Users(
+            users=[
+                User(name="Alice", age=27, items=[Item(name="iPhone12")]),
+                User(name="Bob", age=30, items=[Item(name="iPhone8"),Item(name="iPhone10")])
+            ]
+        )
     )
-)
 
-save(json_str, file)
-print(f"{json_str == tojson(Users([]).load(load(file))) = }")
-"""
-{"Users": [
-        {"User": {"name": "Alice", "age": 27, "items": [{"Item": {"name": "iPhone12"}}]}},
-        {"User": {"name": "Bob", "age": 30, "items": [{"Item": {"name": "iPhone8"}}, {"Item": {"name": "iPhone10"}}]}}
-    ]
-}
-"""
+    save(json_str, file)
+    print(f"{json_str == tojson(Users([]).load(load(file))) = }")
+    """
+    {"Users": [
+            {"User": {"name": "Alice", "age": 27, "items": [{"Item": {"name": "iPhone12"}}]}},
+            {"User": {"name": "Bob", "age": 30, "items": [{"Item": {"name": "iPhone8"}}, {"Item": {"name": "iPhone10"}}]}}
+        ]
+    }
+    """
