@@ -1,14 +1,3 @@
-from simpleRPG2 import (
-    ABC,
-    os,
-    random,
-    sys,
-    abstractmethod,
-    copy,
-    deepcopy,
-    integer,
-)
-
 from simpleRPG2.tests import (
     jsonconverter
 )
