@@ -23,13 +23,18 @@ class Player:
             "heal": HealCommand()
         }
         self.commands_history = []
+        self.__exec_commands = None
 
-    def command_execute(self, command_name):
+    def execute_command(self, command_name):
         cmd = self.commands.get(
             command_name,
             AttackCommand())
         self.commands_history.append(cmd)
         return cmd.execute()
+
+    def execute_commands(self, commands_name):
+        return [self.execute_command(cmd_name) for cmd_name in commands_name]
+
 
     def replay(self, n, reverse=False):
         history = self.commands_history[-n:]
@@ -39,7 +44,6 @@ class Player:
             cmd.execute()
 
 player = Player()
-player.command_execute("attack")
-player.command_execute("heal")
-player.command_execute("attack")
+player.execute_commands(["attack", "heal"])
+player.execute_command("attack")
 player.replay(2)
