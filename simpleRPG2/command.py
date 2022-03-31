@@ -23,7 +23,6 @@ class Player:
             "heal": HealCommand()
         }
         self.commands_history = []
-        self.__exec_commands = None
 
     def execute_command(self, command_name):
         cmd = self.commands.get(
