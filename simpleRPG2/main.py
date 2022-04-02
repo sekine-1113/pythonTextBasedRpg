@@ -95,9 +95,7 @@ def test_player_manager():
     print(f"{player_manager.get(3)=}")
     player_manager.sort()
 
-    print(f"{player_manager.tojson()=}")
-
-    save["players"] = player_manager.tojson()
+    save["players"] = jsonconverter.tojson(player_manager)
     print(save["players"])
 
 
