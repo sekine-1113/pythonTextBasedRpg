@@ -23,7 +23,7 @@ class tojson:
             set: cls._fromset,
         }
 
-        class_vars = copy(_class.__dict__)
+        class_vars: dict = copy(_class.__dict__)
         varname: str
         for varname, value in class_vars.items():
             if value.__class__ in cls.unsupported:
