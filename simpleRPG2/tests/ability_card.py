@@ -33,7 +33,7 @@ class AbilityDeck:
     def draw(self):
         card = self.cards.pop()
         self.__trushes.append(card)
-        print("Draw: "+ str(card), "@",self.length())
+        print("Draw: "+ str(card), "@", len(self))
         return card
 
     def shuffle(self):
@@ -43,7 +43,7 @@ class AbilityDeck:
     def show(self):
         print(*self.cards)
 
-    def length(self):
+    def __len__(self):
         return len(self.cards)
 
 
@@ -59,7 +59,8 @@ deck.draw()
 deck.draw()
 deck.draw()
 deck.rebuild(2)
-print(deck.length())
 deck.show()
 deck.rebuild(2)
 deck.show()
+
+print(len(deck))
