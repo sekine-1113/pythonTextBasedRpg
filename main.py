@@ -31,3 +31,6 @@ actor.setAbility(Ability("FireBall"))
 actor.setAbility(Ability("IceBall"))
 
 actor.getAbility("FireBall").execute()
+actor.getAbility("IceBall").execute()
+
+print(actor.abilities)
