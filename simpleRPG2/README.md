@@ -2,4 +2,4 @@
 
 # Download
 
-<a download="main.py">main.py</a>
+<a href="./main.py" download="main.py">main.py</a>
