@@ -1,9 +1,9 @@
-from simpleRPG.interface import (
+from betasimpleRPG.interface import (
     ABC,
     abstractmethod,
     random,
 )
-from simpleRPG.interface.status import IStatus
+from betasimpleRPG.interface.status import IStatus
 
 
 class IActor(ABC):

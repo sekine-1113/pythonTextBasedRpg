@@ -1,14 +1,14 @@
-from simpleRPG import Singleton
-from simpleRPG.concrete import (
+from betasimpleRPG import Singleton
+from betasimpleRPG.concrete import (
     Enemy,
     EnemyStatus,
     Player,
     PlayerStatus,
 )
-from simpleRPG.io import (
+from betasimpleRPG.io import (
     integer,
 )
-from simpleRPG.io.file import (
+from betasimpleRPG.io.file import (
     load,
     dump,
     exists,

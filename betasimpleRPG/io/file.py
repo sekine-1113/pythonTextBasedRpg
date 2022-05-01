@@ -1,8 +1,8 @@
-from simpleRPG import (
+from betasimpleRPG import (
     os,
     sys,
 )
-from simpleRPG.io import (
+from betasimpleRPG.io import (
     json,
 )
 

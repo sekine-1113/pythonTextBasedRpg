@@ -1,8 +1,8 @@
-from simpleRPG import deepcopy
-from simpleRPG.interface import random
-from simpleRPG.interface.actor import IActor
-from simpleRPG.interface.status import IStatus
-from simpleRPG.interface.weapon import IWeapon
+from betasimpleRPG import deepcopy
+from betasimpleRPG.interface import random
+from betasimpleRPG.interface.actor import IActor
+from betasimpleRPG.interface.status import IStatus
+from betasimpleRPG.interface.weapon import IWeapon
 
 
 class PlayerStatus(IStatus):

@@ -1,4 +1,4 @@
-from simpleRPG2.tests import (
+from betasimpleRPG2.tests import (
     jsonconverter
 )
 

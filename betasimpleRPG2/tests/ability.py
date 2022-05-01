@@ -18,11 +18,12 @@ class Actor:
         self.abilities.append(ability)
 
     def getAbility(self, ability_name) -> Ability:
-        ability: Ability
-        for ability in self.abilities:
-            if ability_name == ability.name:
-                return ability
-        return
+        return list(
+            filter(
+                (lambda x: ability_name == x.name),
+                self.abilities
+            )
+        )[0]
 
 
 

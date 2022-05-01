@@ -1,4 +1,4 @@
-from simpleRPG.interface import (
+from betasimpleRPG.interface import (
     ABC,
     abstractmethod,
 )
