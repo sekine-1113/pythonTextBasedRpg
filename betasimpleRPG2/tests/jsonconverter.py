@@ -3,15 +3,45 @@ from copy import copy
 
 
 class tojson:
+    """User-defined class convert to json
+
+    Args:
+    _class (object): instance of user-defined class
+
+    Returns:
+    dict: json object.
+        bytes -> string\n
+        bytearray -> string\n
+        list, set, tuple -> json array
+
+    Class Methods:
+    `get_supported_classes` (tuple): tojson supported classes.
+    `_from<type>` (<type>): convert from <type> to json object\n
+    Examples:
+    >>> tojson._fromint(123) == 123
+    True
+    >>> tojson._fromset({123, 456}) == [123, 456]
+    True
+
+    `_fromclass` (user-defined class): convert from instance of user-defined class to json object\n
+
+    Examples:
+    >>> class User:
+    >>>    def __init__(self, name: str, age: int):
+    >>>        self.name = name
+    >>>        self.age = age
+
+    >>> tojson._fromclass(User(name='Alice', age=20)) == {'name': 'Alice', 'age': 20}
+    True
+    """
+
     unsupported = (
         complex,
-        bytes,
-        bytearray,
         memoryview,
-        range,
     )
 
-    def __new__(cls, _class) -> dict:
+
+    def __new__(cls, _class=None) -> dict:
         cls._funcs = {
             int: cls._fromint,
             float: cls._fromfloat,
@@ -21,13 +51,19 @@ class tojson:
             tuple: cls._fromtuple,
             dict: cls._fromdict,
             set: cls._fromset,
+            bytes: cls._frombytes,
+            bytearray: cls._frombytearray,
         }
+
+        if _class is None:
+            return cls._funcs
 
         class_vars: dict = copy(_class.__dict__)
         varname: str
         for varname, value in class_vars.items():
             if value.__class__ in cls.unsupported:
-                continue
+                print(value.__class__, "is unsupported. it converted to `str` object.")
+                value = str(value)
             if value is not None:
                 func = cls._funcs.get(value.__class__, cls._fromclass)
                 value = func(value)
@@ -35,102 +71,157 @@ class tojson:
         return json.loads(json.dumps(class_vars))
 
     @classmethod
+    def get_supported_var_type(cls) -> tuple:
+        """Gets the types of class variables supported by tojson.
+        Returns: tuple
+        """
+        return tuple(tojson().keys())
+
+    @classmethod
     def _fromint(cls, value: int) -> int:
+        """Convert from int to json object.
+        >>> tojson.fromint(123)
+        123
+        """
         return value
 
     @classmethod
     def _fromfloat(cls, value: float) -> float:
+        """Convert from float to json object.
+        >>> tojson.fromfloat(3.14)
+        3.14
+        """
         return value
 
     @classmethod
     def _fromstr(cls, value: str) -> str:
+        """Convert from str to json object.
+        >>> tojson.fromstr("Alice")
+        Alice
+        """
         return value
 
     @classmethod
+    def _frombytes(cls, value: bytes) -> str:
+        """Convert from bytes to json object.
+
+        This is an implicit conversion from bytes to str
+
+        >>> tojson.frombytes(b"Alice")
+        Alice
+        """
+        return value.decode()
+
+    @classmethod
+    def _frombytearray(cls, value: bytearray) -> str:
+        """Convert from bytes to json object.
+
+        This is an implicit conversion from bytearray to str
+
+        >>> tojson.frombytearray([97, 98, 99, 100, 101])
+        abcde
+        """
+        return value.decode()
+
+    @classmethod
     def _frombool(cls, value: bool) -> bool:
+        """Convert from bool to json object.
+
+        >>> tojson.frombool(True)
+        True
+        """
         return value
 
     @classmethod
     def _fromlist(cls, value: list) -> list:
+        """Convert from list to json object.
+
+        >>> tojson.fromlist(["Apple", "Banana", "Orange"])
+        ['Apple', 'Banana', 'Orange']
+        """
         cp = copy(value)
         for i, item in enumerate(cp):
             if item.__class__ in cls.unsupported:
-                continue
-            func = cls._funcs.get(item.__class__, cls._fromclass)
+                print(value.__class__, "is unsupported. it converted to `str` object.")
+                item = str(item)
+            func = tojson().get(item.__class__, cls._fromclass)
             cp[i] = func(item)
         return cp
 
     @classmethod
     def _fromtuple(cls, value: tuple) -> list:
+        """Convert from tuple to json object.
+
+        This is an implicit conversion from tuple to list.
+        Equivalent to: `cls._fromlist(list(value))`
+
+        >>> tojson.fromtuple(("Apple", "Banana", "Orange"))
+        ['Apple', 'Banana', 'Orange']
+        """
         return cls._fromlist(list(value))
 
     @classmethod
     def _fromdict(cls, value: dict) -> dict:
+        """Convert from dict to json object.
+
+        >>> tojson.fromdict({"name": "Alice", "age": 20})
+        {'name': 'Alice', 'age': 20}
+        """
         cp = copy(value)
         for varname, val in cp.items():
             if val.__class__ in cls.unsupported:
-                continue
-            func = cls._funcs.get(val.__class__, cls._fromclass)
+                print(value.__class__, "is unsupported. it converted to `str` object.")
+                val = str(val)
+            func = tojson().get(val.__class__, cls._fromclass)
             cp[varname] = func(val)
         return cp
 
     @classmethod
     def _fromclass(cls, value: object) -> dict:
+        """ Convert from user-defined class to json object.
+
+        Equivalent to: `tojson(value)`
+
+        >>> class User:
+        >>>     def __init__(self, name):
+        >>>         self.name = name
+        >>> tojson.fromclass(User("Alice"))
+        {'name': 'Alice'}
+        """
         return cls.__new__(cls, value)
 
     @classmethod
     def _fromset(cls, value: set) -> list:
+        """Convert from set to json object.
+
+        This is an implicit conversion from set to list.
+        Equivalent to: `cls._fromlist(list(value))`
+
+        >>> tojson.fromset({"Apple", "Banana", "Orange"})
+        ['Apple', 'Banana', 'Orange']
+        """
         return cls._fromlist(list(value))
 
 
-class Item:
-    def __init__(self, name) -> None:
-        self.name = name
-
-class User:
-    def __init__(self, name, age, items) -> None:
-        self.name = name
-        self.age = age
-        self.items = items
-
-
-class Users:
-    def __init__(self, users: list[User]) -> None:
-        self.users = users
-
-    def load(self, json_str: str) -> None:
-        for user in json_str['users']:
-            self.users.append(User(user['name'], user['age'], [Item(item['name']) for item in user['items']]))
-        return self
-
-def save(json_str: str, file: str, encoding: str="UTF-8"):
-    with open(file, "w", encoding=encoding) as f:
-        json.dump(json_str, f, indent=4)
-
-
-def load(file, encoding: str="UTF-8"):
-    with open(file, "r", encoding=encoding) as f:
-        return json.load(f)
-
 
 if __name__ == "__main__":
-    file = r"simpleRPG2\tests\test.json"
+    assert tojson._fromint(123) == 123
+    assert tojson._fromfloat(3.14) == 3.14
+    assert tojson._frombool(True) == True
+    assert tojson._fromstr("Alice") == "Alice"
+    assert tojson._fromtuple((1, 2, 3)) == [1, 2, 3]
+    assert tojson._fromlist([1, 2, 3]) == [1, 2, 3]
+    assert tojson._fromset({1, 2, 3}) == [1, 2, 3]
+    assert tojson._fromdict({"name": "Alice", "age": 20}) == {"name": "Alice", "age": 20}
+    assert tojson._frombytes("Alice".encode()) == "Alice"
+    assert tojson._frombytearray(bytearray([97, 98, 99, 100, 101])) == "abcde"
 
-    json_str = tojson(
-        Users(
-            users=[
-                User(name="Alice", age=27, items=[Item(name="iPhone12")]),
-                User(name="Bob", age=30, items=[Item(name="iPhone8"),Item(name="iPhone10")])
-            ]
-        )
-    )
+    class User:
+        def __init__(self, name: str, age: int) -> None:
+            self.name = name
+            self.age = age
 
-    save(json_str, file)
-    print(f"{json_str == tojson(Users([]).load(load(file))) = }")
-    """
-    {"Users": [
-            {"User": {"name": "Alice", "age": 27, "items": [{"Item": {"name": "iPhone12"}}]}},
-            {"User": {"name": "Bob", "age": 30, "items": [{"Item": {"name": "iPhone8"}}, {"Item": {"name": "iPhone10"}}]}}
-        ]
-    }
-    """
+    assert tojson._fromclass(User("Alice", 20)) == {"name": "Alice", "age": 20}
+    assert tojson(User("Alice", 20)) == {"name": "Alice", "age": 20}
+
+    assert tojson().get(int)(123) == 123

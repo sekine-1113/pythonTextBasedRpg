@@ -1,3 +1,5 @@
+
+
 def integer(prompt:str="> ") -> int:
     user_input = input(prompt)
     try:
