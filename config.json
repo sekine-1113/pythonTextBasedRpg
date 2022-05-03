@@ -1,0 +1,13 @@
+{
+    "game_config": {
+        "using_lang": "ja",
+        "allow_lang": [
+            "ja",
+            "en"
+        ]
+    },
+    "using_dirs": {
+        "base": ""
+    },
+    "game_version": "0.0.0"
+}

@@ -1,5 +1,5 @@
-from betasimpleRPG2.tests import (
-    jsonconverter
+from games.cui.textbasedrpg.util import (
+    converter
 )
 
 
@@ -76,7 +76,7 @@ def test_player_manager():
             self.players.sort(key=lambda x: x.id)
 
         def tojson(self) -> dict:
-            return jsonconverter.tojson(self)
+            return converter.tojson(self)
 
 
 
@@ -95,7 +95,7 @@ def test_player_manager():
     print(f"{player_manager.get(3)=}")
     player_manager.sort()
 
-    save["players"] = jsonconverter.tojson(player_manager)
+    save["players"] = converter.tojson(player_manager)
     print(save["players"])
 
 
