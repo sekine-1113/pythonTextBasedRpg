@@ -203,7 +203,6 @@ class tojson:
         return cls._fromlist(list(value))
 
 
-
 if __name__ == "__main__":
     assert tojson._fromint(123) == 123
     assert tojson._fromfloat(3.14) == 3.14
@@ -214,7 +213,9 @@ if __name__ == "__main__":
     assert tojson._fromset({1, 2, 3}) == [1, 2, 3]
     assert tojson._fromdict({"name": "Alice", "age": 20}) == {"name": "Alice", "age": 20}
     assert tojson._frombytes("Alice".encode()) == "Alice"
+    assert tojson._frombytes(bytes([97])) == "a"
     assert tojson._frombytearray(bytearray([97, 98, 99, 100, 101])) == "abcde"
+
 
     class User:
         def __init__(self, name: str, age: int) -> None:
@@ -223,5 +224,5 @@ if __name__ == "__main__":
 
     assert tojson._fromclass(User("Alice", 20)) == {"name": "Alice", "age": 20}
     assert tojson(User("Alice", 20)) == {"name": "Alice", "age": 20}
-
+    # tojson._fromint = lambda x: x*2
     assert tojson().get(int)(123) == 123
