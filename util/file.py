@@ -1,12 +1,12 @@
 import copy
 import csv
-import json
 import io
+import json
 
 
 def read_csv(file=None):
     if file.endswith(".csv"):
-        with open(file, "r", newline="") as f:
+        with open(file, "r", encoding="UTF-8", newline="") as f:
             reader = csv.DictReader(f)
             return [r for r in reader]
     else:
@@ -14,19 +14,20 @@ def read_csv(file=None):
         f.write(file)
         f.seek(0)
         reader = csv.DictReader(f)
-    return [r for r in reader]
-
-def castInt(x):
-    x = copy.copy(x)
-    for k,v in x.items():
-        try:
-            x[k] = int(v)
-        except ValueError:
-            pass
-    return x
+        d = [r for r in reader]
+        f.close()
+    return d
 
 def csv_to_json(data, default_key="object"):
-    d = {}
+    def castInt(x):
+        x = copy.copy(x)
+        for k,v in x.items():
+            try:
+                x[k] = int(v)
+            except ValueError:
+                pass
+        return x
+    d = dict()
     d[default_key] = list(
         map(
             castInt,
@@ -35,20 +36,43 @@ def csv_to_json(data, default_key="object"):
     )
     return json.loads(json.dumps(d))
 
-def json_to_csv(csvfile, data):
-    data = data[list(data.keys())[0]]
-    fieldnames = list(data[0].keys())
-    with open(csvfile, "w") as fp:
-        writer = csv.DictWriter(fp, fieldnames=fieldnames)
+def json_to_csv(data, csvfile=None):
+    def write(fp, fieldnames):
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for dat in data:
             writer.writerow(dat)
+        return writer
 
-data = """name,age
+    data = data[list(data.keys())[0]]
+    if len(data) <= 0: return
+    fieldnames = list(data[0].keys())
+
+    f = io.StringIO()
+    f.seek(0)
+    write(f, fieldnames)
+    d = f.getvalue()
+    f.close()
+    if csvfile is None: return d
+
+    with open(csvfile, "w", encoding="UTF-8", newline="") as fp:
+        write(fp, fieldnames)
+    return d
+
+
+if __name__ == "__main__":
+    data = """name,age
 Alice,20
 Bob,21"""
-j1=csv_to_json(data)
-print(j1)
-json_to_csv("test.out.csv", j1)
-j2=csv_to_json("test.out.csv")
-print(j2)
+    csv_path = r"D:\myscript\games\cui\textbasedrpg\text.csv"
+    messages = csv_to_json(csv_path)
+
+    def find_text(text_id, using_lang):
+        for message in messages.get("object"):
+            if message.get("text_id") == text_id:
+                return message.get(using_lang)
+        return
+
+    text_id = "update"
+    using_lang = "en"
+    print(find_text(text_id, using_lang))
