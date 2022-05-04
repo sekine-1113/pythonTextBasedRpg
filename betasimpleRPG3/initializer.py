@@ -27,7 +27,7 @@ if not config_dir.exists():
 try:
     config = requests.get(__simpleRPG_config).json()
 except requests.ConnectionError as e:
-    print(e.response)
+    print(e)
     config = {
         "game_config": {
             "using_lang": "ja",

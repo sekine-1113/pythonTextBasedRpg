@@ -1,8 +1,8 @@
 {
     "ja": {
-        "update": "アップデートしてください。"
+        "update": "新しいバージョンがあります。更新してください。"
     },
     "en": {
-        "update": "needs to be updated."
+        "update": "A new version has been released. You needs to be updated."
     }
 }
