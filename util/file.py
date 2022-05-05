@@ -38,7 +38,7 @@ def csv_to_json(data, default_key="object"):
 
 def json_to_csv(data, csvfile=None):
     def write(fp, fieldnames):
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(fp, fieldnames=fieldnames)
         writer.writeheader()
         for dat in data:
             writer.writerow(dat)
@@ -61,9 +61,6 @@ def json_to_csv(data, csvfile=None):
 
 
 if __name__ == "__main__":
-    data = """name,age
-Alice,20
-Bob,21"""
     csv_path = r"D:\myscript\games\cui\textbasedrpg\text.csv"
     messages = csv_to_json(csv_path)
 
