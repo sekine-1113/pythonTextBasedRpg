@@ -30,11 +30,11 @@ def normalize(s, t):
     return 1 - levenshtein(s, t) / max(len(s), len(t))
 
 
-allow_str = ["hello", "world", "good", "python"]
+allow_str = ["hello", "world", "good", "python","god"]
 while True:
     user_input = input(">> ")
     if user_input in allow_str:
-        print("入力値正常")
+        continue
     else:
         maybe = []
         for s in allow_str:
