@@ -39,7 +39,7 @@ while True:
         maybe = []
         for s in allow_str:
             n = normalize(user_input, s)
-            if n >= 0.65:
+            if n >= 0.6:
                 maybe.append(s)
         print("もしかして", maybe, "じゃない?")
 
