@@ -53,29 +53,29 @@ class File(CompositObject):
     def __repr__(self) -> str:
         return f"{self.path}"
 
+def main():
+    current = Dirctory("C:")
+    current.path = "C:"
+    current.add(Dirctory("temp"))
+    current.add(File("temp.py"))
+    print(current.path+">")
+    current.show()
+    current = current.change("temp")
+    current.add(File("some.py"))
+    print(current.path+">")
+    current.show()
+    current = current.change("..")
+    print(current.path+">")
+    current.show()
+    current = current.change("temp")
+    current.add(Dirctory("sub"))
+    current.add(Dirctory("third"))
+    current = current.change("sub")
+    current.add(File("main.py"))
 
-current = Dirctory("C:")
-current.path = "C:"
-current.add(Dirctory("temp"))
-current.add(File("temp.py"))
-print(current.path+">")
-current.show()
-current = current.change("temp")
-current.add(File("some.py"))
-print(current.path+">")
-current.show()
-current = current.change("..")
-print(current.path+">")
-current.show()
-current = current.change("temp")
-current.add(Dirctory("sub"))
-current.add(Dirctory("third"))
-current = current.change("sub")
-current.add(File("main.py"))
-
-current = current.change("..")
-print(current.path+">")
-current.show()
+    current = current.change("..")
+    print(current.path+">")
+    current.show()
 
 
 
