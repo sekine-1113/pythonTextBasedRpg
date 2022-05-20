@@ -19,6 +19,13 @@ class Dirctory(CompositObject):
         _object.path += self.name + self.spi + _object.name
         self.children.append(_object)
 
+    def input_command(self):
+        command = input(f"{self.path}>")
+        if command == "cd":
+            return self.change(input("path?>"))
+        return
+
+
     def change(self, path: str):
         print("cd", path)
         if path.startswith(".."):
@@ -58,14 +65,11 @@ def main():
     current.path = "C:"
     current.add(Dirctory("temp"))
     current.add(File("temp.py"))
-    print(current.path+">")
     current.show()
     current = current.change("temp")
     current.add(File("some.py"))
-    print(current.path+">")
     current.show()
     current = current.change("..")
-    print(current.path+">")
     current.show()
     current = current.change("temp")
     current.add(Dirctory("sub"))
