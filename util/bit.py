@@ -19,8 +19,12 @@ class Bit:
     def update_bit(self, new_bit):
         self.bit &= ~new_bit
 
+    def has_bit(self, _bit):
+        return ~self.bit & _bit
+
 status_bit = Bit(Status.NONE)
 status_bit.set_bit(Status.NEMURI)
 print(status_bit.get_bit())
 status_bit.update_bit(Status.NEMURI)
 print(status_bit.get_bit())
+print(status_bit.has_bit(Status.NEMURI))
