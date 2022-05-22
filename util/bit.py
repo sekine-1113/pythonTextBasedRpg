@@ -22,9 +22,11 @@ class Bit:
     def has_bit(self, _bit):
         return ~self.bit & _bit
 
-status_bit = Bit(Status.NONE)
-status_bit.set_bit(Status.NEMURI)
-print(status_bit.get_bit())
-status_bit.update_bit(Status.NEMURI)
-print(status_bit.get_bit())
-print(status_bit.has_bit(Status.NEMURI))
+
+if __name__ == "__main__":
+    status_bit = Bit(Status.NONE)
+    status_bit.set_bit(Status.NEMURI)
+    print(status_bit.get_bit())
+    status_bit.update_bit(Status.NEMURI)
+    print(status_bit.get_bit())
+    print(status_bit.has_bit(Status.NEMURI))
