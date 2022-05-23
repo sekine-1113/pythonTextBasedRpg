@@ -1,5 +1,3 @@
-from pprint import pprint
-
 
 def levenshtein(s: str, t: str) -> int:
     s = s.lower()
@@ -30,6 +28,8 @@ def normalize(s, t):
     return 1 - levenshtein(s, t) / max(len(s), len(t))
 
 
+t = 0.6
+
 allow_str = ["hello", "world", "good", "python","god"]
 while True:
     user_input = input(">> ")
@@ -39,7 +39,7 @@ while True:
         maybe = []
         for s in allow_str:
             n = normalize(user_input, s)
-            if n >= 0.6:
+            if n >= t:
                 maybe.append(s)
         print("もしかして", maybe, "じゃない?")
 
