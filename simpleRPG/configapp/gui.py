@@ -16,3 +16,4 @@ while True:
     window["-name-"].update(values["-nameinput-"],text_color="red")
 
 window.close()
+
