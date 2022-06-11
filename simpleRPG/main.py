@@ -13,3 +13,7 @@ class simpleRPG:
 def main():
     rpg = simpleRPG()
     rpg.main()
+
+
+if __name__ == "__main__":
+    main()
