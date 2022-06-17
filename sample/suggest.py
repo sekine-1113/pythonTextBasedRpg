@@ -27,19 +27,21 @@ def levenshtein(s: str, t: str) -> int:
 def normalize(s, t):
     return 1 - levenshtein(s, t) / max(len(s), len(t))
 
+if __name__ == "__main__":
+    t = 0.6
 
-t = 0.6
+    allow_str = ["hello", "world", "good", "python","god"]
+    while True:
+        user_input = input(">> ")
+        if user_input in allow_str:
+            continue
+        else:
+            maybe = []
+            for s in allow_str:
+                n = normalize(user_input, s)
+                if n >= t:
+                    maybe.append(s)
+            print("もしかして", maybe, "じゃない?")
 
-allow_str = ["hello", "world", "good", "python","god"]
-while True:
-    user_input = input(">> ")
-    if user_input in allow_str:
-        continue
-    else:
-        maybe = []
-        for s in allow_str:
-            n = normalize(user_input, s)
-            if n >= t:
-                maybe.append(s)
-        print("もしかして", maybe, "じゃない?")
+
 
