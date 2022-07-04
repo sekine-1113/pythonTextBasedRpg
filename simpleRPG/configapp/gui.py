@@ -5,6 +5,7 @@ import PySimpleGUI as sg
 class EventHandlers:
     Update = "-update-"
     Write = "-write-"
+    Exit = "-exit-"
 
 layout = [
     [sg.T("Hello!"), sg.T("", size=(20, 1), key="-name-")],
@@ -26,7 +27,8 @@ def write_event(values):
 
 event_handler = {
     EventHandlers.Update: update_event,
-    EventHandlers.Write: write_event
+    EventHandlers.Write: write_event,
+    EventHandlers.Exit: lambda: print("Exit")
 }
 while True:
     event, values = window.read()
