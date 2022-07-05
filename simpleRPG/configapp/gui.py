@@ -28,7 +28,7 @@ def write_event(values):
 event_handler = {
     EventHandlers.Update: update_event,
     EventHandlers.Write: write_event,
-    EventHandlers.Exit: lambda: print("Exit")
+    # EventHandlers.Exit: lambda: print("Exit")
 }
 while True:
     event, values = window.read()
