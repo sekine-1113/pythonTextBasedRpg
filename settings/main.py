@@ -7,3 +7,5 @@ print("...DONE!")
 config = {
     "run": "run.exe"
 }
+
+print(config)
