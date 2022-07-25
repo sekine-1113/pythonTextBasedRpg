@@ -6,7 +6,8 @@ print("...DONE!")
 
 config = {
     "run": "run.exe",
-    "setup": "setup.exe"
+    "setup": "setup.exe",
+    "reset": "reset.exe"
 }
 
 print(config)
