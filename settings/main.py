@@ -8,7 +8,8 @@ config = {
     "run": "run.exe",
     "setup": "setup.exe",
     "reset": "reset.exe",
-    "uninstall": "uninstall.exe"
+    "uninstall": "uninstall.exe",
+    "cleanup": "cleanup.exe"
 }
 
 print(config)
