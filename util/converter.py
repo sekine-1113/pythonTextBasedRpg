@@ -2,6 +2,12 @@ import json
 from copy import copy
 
 
+class convertError(Exception):
+    pass
+
+class unSupportedError(Exception):
+    pass
+
 class tojson:
     """User-defined class convert to json
 
@@ -40,8 +46,7 @@ class tojson:
         memoryview,
     )
 
-
-    def __new__(cls, _class=None) -> dict:
+    def __new__(cls, _class=None, default_key="data") -> dict:
         cls._funcs = {
             int: cls._fromint,
             float: cls._fromfloat,
@@ -57,8 +62,12 @@ class tojson:
 
         if _class is None:
             return cls._funcs
-
-        class_vars: dict = copy(_class.__dict__)
+        if not hasattr(_class, "__dict__"):
+            class_vars: dict = copy(_class)
+            if isinstance(_class, list|set|tuple):
+                class_vars: dict = {default_key: cls._fromlist(_class)}
+        else:
+            class_vars: dict = copy(_class.__dict__)
         varname: str
         for varname, value in class_vars.items():
             if value.__class__ in cls.unsupported:
@@ -68,7 +77,8 @@ class tojson:
                 func = cls._funcs.get(value.__class__, cls._fromclass)
                 value = func(value)
             class_vars[varname] = value
-        return json.loads(json.dumps(class_vars))
+        result = json.loads(json.dumps(class_vars))
+        return result
 
     @classmethod
     def get_supported_var_type(cls) -> tuple:
@@ -203,6 +213,7 @@ class tojson:
         return cls._fromlist(list(value))
 
 
+
 if __name__ == "__main__":
     assert tojson._fromint(123) == 123
     assert tojson._fromfloat(3.14) == 3.14
@@ -226,3 +237,12 @@ if __name__ == "__main__":
     assert tojson(User("Alice", 20)) == {"name": "Alice", "age": 20}
     # tojson._fromint = lambda x: x*2
     assert tojson().get(int)(123) == 123
+
+    # tojson()
+    with open("sample.json", "w", encoding="UTF-8") as f:
+        json.dump(tojson([
+            {
+                "User1": User("Alice", 20),
+                "User2": User("Bob", 24)},
+            {"Enemy1": User("Slime", 300)}
+        ], "data"), f, indent=4)
