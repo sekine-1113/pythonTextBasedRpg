@@ -46,10 +46,10 @@ def create_random_password(n: int=16):
     return row_password, password.hexdigest()
 
 
-def confirm_password(hashed_path):
+def confirm_password(hashed_pass):
     password = getpass("Confirm Password:")
     user_password = sha256(password.encode())
-    return user_password.hexdigest() == hashed_path
+    return user_password.hexdigest() == hashed_pass
 
 
 

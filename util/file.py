@@ -21,19 +21,12 @@ def read_csv(file=None):
 def csv_to_json(data, default_key="object"):
     def castInt(x):
         x = copy.copy(x)
-        for k,v in x.items():
-            try:
-                x[k] = int(v)
-            except ValueError:
-                pass
+        for k, v in x.items():
+            try: x[k] = int(v)
+            except ValueError: pass
         return x
     d = dict()
-    d[default_key] = list(
-        map(
-            castInt,
-            read_csv(data)
-        )
-    )
+    d[default_key] = list(map(castInt, read_csv(data)))
     return json.loads(json.dumps(d))
 
 def json_to_csv(data, csvfile=None):

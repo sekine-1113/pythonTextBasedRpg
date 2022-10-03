@@ -22,12 +22,3 @@ class UserName(ValueObject):
 
     def change(self, user_name) -> "UserName":
         return UserName(user_name)
-
-
-user = UserName("Alice")
-
-print(user.get)
-
-user = user.change("Bob")
-
-print(user.get)
