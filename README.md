@@ -9,5 +9,7 @@ Only Quest Battle Game.
 - no equipments
 - no items
 
+- auto save
+
 # version
 0.0
