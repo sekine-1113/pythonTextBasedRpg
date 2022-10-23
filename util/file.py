@@ -4,18 +4,26 @@ import io
 import json
 
 
-def read_csv(fileOrText: str=None) -> list:
+def read_csv(fileOrText: str=None, return_type = dict) -> list:
     if fileOrText.endswith(".csv"):
         with open(fileOrText, "r", encoding="UTF-8", newline="") as f:
+            if return_type is not dict:
+                reader = csv.reader(f)
+                return [r for r in reader]
             reader = csv.DictReader(f)
             return [r for r in reader]
+
     else:
         f = io.StringIO()
         f.write(fileOrText)
         f.seek(0)
-        reader = csv.DictReader(f)
-        reader.fieldnames = fileOrText.split("\n")[0].split(",")
-        d = [r for r in reader][1:]
+        if return_type is not dict:
+            reader = csv.reader(f)
+            d = [r for r in reader]
+        else:
+            reader = csv.DictReader(f)
+            reader.fieldnames = fileOrText.split("\n")[0].split(",")
+            d = [r for r in reader][1:]
         f.close()
     return d
 
@@ -34,34 +42,34 @@ def csv_to_json(data, default_key="object") -> dict:
 
 # csvに変換
 def json_to_csv(data, csvfile=None) -> str:
-    def write(fp, fieldnames):
+    def write(fp, fieldnames=None):
         writer = csv.DictWriter(fp, fieldnames=fieldnames)
         writer.writeheader()
         for dat in data:
             writer.writerow(dat)
         return writer
 
-    data = data[list(data.keys())[0]]
-    if len(data) <= 0: return
-    fieldnames = list(data[0].keys())
+    if hasattr(data[0], "keys"):
+        fieldnames = list(data[0].keys())
 
-    f = io.StringIO()
-    f.seek(0)
-    write(f, fieldnames)
-    d = f.getvalue()
-    f.close()
-    if csvfile is None:
+        f = io.StringIO()
+        f.seek(0)
+        write(f, fieldnames)
+        d = f.getvalue()
+        f.close()
+        if csvfile is None:
+            return d
+
+        with open(csvfile, "w", encoding="UTF-8", newline="") as fp:
+            write(fp, fieldnames)
         return d
-
-    with open(csvfile, "w", encoding="UTF-8", newline="") as fp:
-        write(fp, fieldnames)
-    return d
-
+    raise Exception("対応していません.")
 
 if __name__ == "__main__":
     csv_ = read_csv("""name,a,b
 alice,2,3
-bob,2,3""")
+bob,2,3""", list)
+    print(csv_)
     print(json_to_csv(csv_))
     # csv_path = r"D:\myscript\games\cui\textbasedrpg\text.csv"
     # messages = csv_to_json(csv_path)

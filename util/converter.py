@@ -1,6 +1,7 @@
 import json
 from copy import copy
 
+import pprint
 
 class convertError(Exception):
     pass
@@ -39,9 +40,20 @@ class tojson:
 
     >>> tojson._fromclass(User(name='Alice', age=20)) == {'name': 'Alice', 'age': 20}
     True
+
+    Application Example:
+    >>> tojson().get(int)(123) == 123
+    True
+    >>> tojson().get(str)("HELLO") == "HELLO"
+    True
+
+    >>> tojson._fromint = lambda x: x*2
+    >>> tojson._fromint(123) == 246
+    True
+
     """
 
-    unsupported = (
+    UNSUPPORTED = (
         complex,
         memoryview,
     )
@@ -70,13 +82,15 @@ class tojson:
             class_vars: dict = copy(_class.__dict__)
         varname: str
         for varname, value in class_vars.items():
-            if value.__class__ in cls.unsupported:
+            if value.__class__ in cls.UNSUPPORTED:
                 print(value.__class__, "is unsupported. it converted to `str` object.")
                 value = str(value)
             if value is not None:
                 func = cls._funcs.get(value.__class__, cls._fromclass)
                 value = func(value)
             class_vars[varname] = value
+        # class_vars = {_class.__class__.__name__: class_vars}
+
         result = json.loads(json.dumps(class_vars))
         return result
 
@@ -151,7 +165,7 @@ class tojson:
         """
         cp = copy(value)
         for i, item in enumerate(cp):
-            if item.__class__ in cls.unsupported:
+            if item.__class__ in cls.UNSUPPORTED:
                 print(value.__class__, "is unsupported. it converted to `str` object.")
                 item = str(item)
             func = tojson().get(item.__class__, cls._fromclass)
@@ -179,7 +193,7 @@ class tojson:
         """
         cp = copy(value)
         for varname, val in cp.items():
-            if val.__class__ in cls.unsupported:
+            if val.__class__ in cls.UNSUPPORTED:
                 print(value.__class__, "is unsupported. it converted to `str` object.")
                 val = str(val)
             func = tojson().get(val.__class__, cls._fromclass)
@@ -227,22 +241,61 @@ if __name__ == "__main__":
     assert tojson._frombytes(bytes([97])) == "a"
     assert tojson._frombytearray(bytearray([97, 98, 99, 100, 101])) == "abcde"
 
-
     class User:
         def __init__(self, name: str, age: int) -> None:
             self.name = name
             self.age = age
 
+        def json(self):
+            return tojson(self)
+
+        def __eq__(self, __o: object) -> bool:
+            if not isinstance(__o, User):
+                return False
+            return self.name == __o.name and self.age == __o.age
+
+        def __repr__(self) -> str:
+            return self.name
+
     assert tojson._fromclass(User("Alice", 20)) == {"name": "Alice", "age": 20}
     assert tojson(User("Alice", 20)) == {"name": "Alice", "age": 20}
-    # tojson._fromint = lambda x: x*2
     assert tojson().get(int)(123) == 123
+    assert tojson().get(str)("HELLO") == "HELLO"
 
-    # tojson()
-    with open("sample.json", "w", encoding="UTF-8") as f:
-        json.dump(tojson([
-            {
-                "User1": User("Alice", 20),
-                "User2": User("Bob", 24)},
-            {"Enemy1": User("Slime", 300)}
-        ], "data"), f, indent=4)
+    with open("./output.json", "w", encoding="UTF-8") as f:
+        # json.dump(tojson(User(name="name", age=20)), f, indent=4)
+        json.dump(User(name="name", age=20).json(), f, indent=4)
+
+    with open("./output.json", "r", encoding="UTF-8") as f:
+        user = User(**json.load(f))
+
+    class Group:
+        def __init__(self, member) -> None:
+            self.member = member
+            self.count = len(member)
+
+        def __eq__(self, __o: object) -> bool:
+            if not isinstance(__o, Group):
+                return False
+            return self.member == __o.member and self.count == __o.count
+
+        def __repr__(self) -> str:
+            return "Group.member = "+ str(self.member)
+
+    group = Group(member=[User(name="あああ", age=20),User(name="いいい", age=22),User(name="ううう", age=21)])
+    group_json = tojson({"Group": group})
+
+    with open("./output.json", "w", encoding="UTF-8") as f:
+        json.dump(group_json, f, indent=4, ensure_ascii=False)
+
+    with open("./output.json", "r", encoding="UTF-8") as f:
+        group_json = json.load(f)["Group"]
+        group_json.pop("count")
+        group_copy = Group(member=list(
+            map(
+                lambda data: User(data['name'], data['age']),
+                Group(**group_json).member
+                )
+            )
+        )
+    assert group == group_copy

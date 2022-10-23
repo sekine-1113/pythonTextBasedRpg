@@ -30,9 +30,9 @@ class Actor:
 
 def gui():
     layout = [
-        [ sg.T("アカウント登録します")],
+        [sg.T("アカウント登録します")],
         [sg.T("ユーザー名"), sg.I(key="-name-")],
-        [sg.T("パスワード"), sg.I(key="-pass-"), sg.B("自動生成")],
+        [sg.T("パスワード"), sg.I(key="-pass-", disabled=True), sg.B("自動生成")],
         [sg.B("登録")]
     ]
 
