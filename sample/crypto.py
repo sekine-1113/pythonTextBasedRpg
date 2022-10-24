@@ -28,3 +28,12 @@ def decrypt(key, crypt):
         d = Dec(ord(s), key)
         decrypted += chr(d)
     return decrypted
+
+
+if __name__ == "__main__":
+    k = keyGen()
+    txt = "hello"
+    print(txt)
+    txt_ = crypt(k, txt)
+    print(txt_)
+    print(decrypt(k, txt_))

@@ -34,12 +34,14 @@ if __name__ == "__main__":
         if user_input in allow_str:
             continue
         else:
-            maybe = []
+            maybe = [(0, "")]
             for s in allow_str:
                 n = normalize(user_input, s)
                 if n >= t:
-                    maybe.append(s)
-            print("もしかして", maybe, "じゃない?")
+                    maybe.append((n, s))
+            max_ = max([m[0] for m in maybe])
+            maybe_word = list(filter(lambda x: x[0]==max_, maybe))[0][1]
+            print(f"Could it be '{maybe_word}'?")
 
 
 
