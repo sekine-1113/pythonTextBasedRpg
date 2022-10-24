@@ -1,7 +1,6 @@
 import json
 from copy import copy
 
-import pprint
 
 class convertError(Exception):
     pass

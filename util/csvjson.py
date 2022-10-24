@@ -5,14 +5,13 @@ import json
 from pathlib import Path
 
 
-
-def loads(text, rtype=dict, skip_header=True):
+def loads(string, rtype=dict, skip_header=True):
     f = io.StringIO()
-    f.write(text)
+    f.write(string)
     f.seek(0)
     if rtype == dict:
         reader = csv.DictReader(f)
-        reader.fieldnames = text.split("\n")[0].split(",")
+        reader.fieldnames = string.split("\n")[0].split(",")
         d = [rt for rt in reader][skip_header:]
     else:
         reader = csv.reader(f)
@@ -51,7 +50,6 @@ def to_csv(data):
 
     return csv_object
 
-
 def to_json(data, default_key="object"):
     def castInt(x):
         x = copy.copy(x)
@@ -64,6 +62,7 @@ def to_json(data, default_key="object"):
     json_object = dict()
     json_object[default_key] = list(map(castInt, data))
     return json.loads(json.dumps(json_object))
+
 
 if __name__ == "__main__":
     csv_object = loads("""name,age\nalice,20""")

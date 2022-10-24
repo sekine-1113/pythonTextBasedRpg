@@ -15,5 +15,5 @@ if False:
     with zipfile.ZipFile("example.zip") as f:
         f.extractall("example_zip_unpacks")
 
-    os.remove("")
+    os.remove("example_zip_unpacks")
 
