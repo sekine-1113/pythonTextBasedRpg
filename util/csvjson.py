@@ -1,74 +1,99 @@
-import copy
 import csv
 import io
-import json
 from pathlib import Path
 
+from pprint import pprint
 
-def loads(string, rtype=dict, skip_header=True):
+def _make_dictionary(csv_data):
+    dictionary = []
+    for data in csv_data:
+        inner = {}
+        for key, value in data.items():
+            if value.isdecimal():
+                value = int(value)
+            inner[key] = value
+        dictionary.append(inner)
+    return dictionary
+
+
+def read_string(string: str, skip_header: bool =True) -> list[dict[str, object]]:
+    """
+    文字列からCSVを読み込む.
+    """
     f = io.StringIO()
     f.write(string)
     f.seek(0)
-    if rtype == dict:
-        reader = csv.DictReader(f)
-        reader.fieldnames = string.split("\n")[0].split(",")
-        d = [rt for rt in reader][skip_header:]
-    else:
-        reader = csv.reader(f)
-        d = [rt for rt in reader]
+    reader = csv.DictReader(f)
+    data = [row for row in reader]
     f.close()
-    return d
+    return _make_dictionary(data)
 
-def load(file, rtype=dict, skip_header=False):
+def read_file(file: Path|str) -> list[dict[str, object]]:
+    """
+    ファイルからCSVを読み込む.
+    """
     if isinstance(file, str):
         file = Path(file)
-        if not file.exists():
-            raise FileNotFoundError
-    elif isinstance(file, Path):
-        if not file.exists():
-            raise FileNotFoundError
-    else:
-        raise TypeError(f"current file type is {type(file)}, but except 'str' or 'Path' object.")
+    if not file.exists():
+        raise FileNotFoundError
+
     with open(file, "r", encoding="UTF-8") as f:
-        if rtype == dict:
-            reader = csv.DictReader(f)
-            d = [rt for rt in reader]
-        else:
-            reader = csv.reader(f)
-            d = [rt for rt in reader][skip_header:]
-    return d
+        reader = csv.DictReader(f)
+        data = [row for row in reader]
+    return _make_dictionary(data)
 
-def to_csv(data):
-    f = io.StringIO()
-    f.seek(0)
-    row = ",".join(data["object"][0].keys()) + "\n"
-    for value in data["object"]:
-        row += ",".join(value.values()) + "\n"
-    f.write(row)
-    csv_object = f.getvalue()
-    f.close()
 
-    return csv_object
+def json2csv(obj: list[dict[str, object]]) -> str:
+    """
+    jsonからcsv文字列に変換する
 
-def to_json(data, default_key="object"):
-    def castInt(x):
-        x = copy.copy(x)
-        for key, value in x.items():
-            try:
-                x[key] = int(value)
-            except ValueError:
-                pass
-        return x
-    json_object = dict()
-    json_object[default_key] = list(map(castInt, data))
-    return json.loads(json.dumps(json_object))
+    入力\n
+    `[{"key": "value1", ...}, ..., {"key": "valueN", ...}]`
 
+    出力\n
+    key,key2,...\n
+    value,value2,...
+    """
+    fieldnames = list(obj[0].keys())
+    with io.StringIO() as f:
+        f.seek(0)
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(obj)
+        csv_string = f.getvalue()
+    return csv_string.replace("\r", "").removesuffix("\n")
 
 if __name__ == "__main__":
-    csv_object = loads("""name,age\nalice,20""")
-
     file = r"D:\myscript\games\cui\textbasedrpg\datastore\text.csv"
-    csv_object_from_file = load(file)
+    csv_text = ""
+    with open(file, "r", encoding="UTF-8") as f:
+        csv_text = f.read()
 
-    print(to_csv(to_json(csv_object_from_file)))
+    excepted_result = [
+        {
+            'user_id': 0,
+            'user_name': 'alice',
+            'password': 'passw0rd',
+            'comment': 'none'
+        },
+        {
+            'user_id': 1,
+            'user_name': 'bob',
+            'password': 'bob1218',
+            'comment': 'none'
+        }
+    ]
 
+
+    csv_object = read_string(csv_text)
+    assert excepted_result == csv_object
+
+    csv_object_from_file = read_file(file)
+    assert excepted_result == csv_object_from_file
+
+    assert csv_text == json2csv(csv_object)
+    assert csv_text == json2csv(csv_object_from_file)
+    print("======= CSV text =======")
+    print(csv_text)
+    print("======= CSV to JSON =======")
+    pprint(csv_object, width=32, sort_dicts=False)
