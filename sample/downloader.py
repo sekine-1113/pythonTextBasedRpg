@@ -3,6 +3,17 @@ import zipfile
 import os
 
 
+# zipインストール
+def download_zip(url, save_filepath):
+    res = requests.get(url)
+    with open(save_filepath, "wb") as f:
+        f.write(res.content)
+
+# 解凍
+def unpack_zip(filepath, unpacked_filepath):
+    with zipfile.ZipFile(filepath) as f:
+        f.extractall(unpacked_filepath)
+
 
 
 if False:

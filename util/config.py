@@ -1,5 +1,6 @@
 from configparser import ConfigParser
 
+
 config = ConfigParser()
 file = r"D:\myscript\games\cui\textbasedrpg\datastore\settings.cfg"
 config["DEFAULT"] = {"Path": "C:/Test"}

@@ -4,21 +4,22 @@ from pathlib import Path
 
 from pprint import pprint
 
-def _make_dictionary(csv_data):
-    dictionary = []
+
+def _make_json(csv_data):
+    json_obj = []
     for data in csv_data:
         inner = {}
         for key, value in data.items():
             if value.isdecimal():
                 value = int(value)
             inner[key] = value
-        dictionary.append(inner)
-    return dictionary
+        json_obj.append(inner)
+    return json_obj
 
 
 def read_string(string: str, skip_header: bool =True) -> list[dict[str, object]]:
     """
-    文字列からCSVを読み込む.
+    文字列からCSVを読み込み辞書型のデータのリストを返却する.
     """
     f = io.StringIO()
     f.write(string)
@@ -26,21 +27,26 @@ def read_string(string: str, skip_header: bool =True) -> list[dict[str, object]]
     reader = csv.DictReader(f)
     data = [row for row in reader]
     f.close()
-    return _make_dictionary(data)
+    return _make_json(data)
+
 
 def read_file(file: Path|str) -> list[dict[str, object]]:
     """
-    ファイルからCSVを読み込む.
+    ファイルからCSVを読み込み辞書型のデータのリストを返却する.
     """
     if isinstance(file, str):
         file = Path(file)
+
+    if not isinstance(file, Path|str):
+        raise TypeError
+
     if not file.exists():
         raise FileNotFoundError
 
     with open(file, "r", encoding="UTF-8") as f:
         reader = csv.DictReader(f)
         data = [row for row in reader]
-    return _make_dictionary(data)
+    return _make_json(data)
 
 
 def json2csv(obj: list[dict[str, object]]) -> str:
@@ -62,6 +68,7 @@ def json2csv(obj: list[dict[str, object]]) -> str:
         writer.writerows(obj)
         csv_string = f.getvalue()
     return csv_string.replace("\r", "").removesuffix("\n")
+
 
 if __name__ == "__main__":
     file = r"D:\myscript\games\cui\textbasedrpg\datastore\text.csv"

@@ -5,8 +5,10 @@ from copy import copy
 class convertError(Exception):
     pass
 
+
 class unSupportedError(Exception):
     pass
+
 
 class tojson:
     """User-defined class convert to json
@@ -283,6 +285,7 @@ if __name__ == "__main__":
 
     group = Group(member=[User(name="あああ", age=20),User(name="いいい", age=22),User(name="ううう", age=21)])
     group_json = tojson({"Group": group})
+    print(group_json)
 
     with open("./output.json", "w", encoding="UTF-8") as f:
         json.dump(group_json, f, indent=4, ensure_ascii=False)
@@ -290,10 +293,11 @@ if __name__ == "__main__":
     with open("./output.json", "r", encoding="UTF-8") as f:
         group_json = json.load(f)["Group"]
         group_json.pop("count")
+        print(group_json)
         group_copy = Group(member=list(
             map(
                 lambda data: User(data['name'], data['age']),
-                Group(**group_json).member
+                group_json["member"]
                 )
             )
         )
