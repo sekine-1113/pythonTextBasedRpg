@@ -22,8 +22,10 @@ def levenshtein(s: str, t: str) -> int:
             )
     return dp[-1][-1]
 
+
 def normalize(s, t):
     return 1 - levenshtein(s, t) / max(len(s), len(t))
+
 
 if __name__ == "__main__":
     t = 0.6

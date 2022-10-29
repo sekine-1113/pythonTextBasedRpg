@@ -16,37 +16,38 @@ def _make_json(csv_data):
         json_obj.append(inner)
     return json_obj
 
-
-def read_string(string: str, skip_header: bool =True) -> list[dict[str, object]]:
-    """
-    文字列からCSVを読み込み辞書型のデータのリストを返却する.
-    """
-    f = io.StringIO()
-    f.write(string)
-    f.seek(0)
-    reader = csv.DictReader(f)
-    data = [row for row in reader]
-    f.close()
-    return _make_json(data)
-
-
-def read_file(file: Path|str) -> list[dict[str, object]]:
-    """
-    ファイルからCSVを読み込み辞書型のデータのリストを返却する.
-    """
-    if isinstance(file, str):
-        file = Path(file)
-
-    if not isinstance(file, Path|str):
-        raise TypeError
-
-    if not file.exists():
-        raise FileNotFoundError
-
-    with open(file, "r", encoding="UTF-8") as f:
+class CSVReader:
+    @classmethod
+    def read_string(self, string: str) -> list[dict[str, object]]:
+        """
+        文字列からCSVを読み込み辞書型のデータのリストを返却する.
+        """
+        f = io.StringIO()
+        f.write(string)
+        f.seek(0)
         reader = csv.DictReader(f)
         data = [row for row in reader]
-    return _make_json(data)
+        f.close()
+        return _make_json(data)
+
+    @classmethod
+    def read_file(self, file: Path|str) -> list[dict[str, object]]:
+        """
+        ファイルからCSVを読み込み辞書型のデータのリストを返却する.
+        """
+
+        if not isinstance(file, Path|str):
+            raise TypeError
+
+        file = Path(file) if isinstance(file, str) else file
+
+        if not file.exists():
+            raise FileNotFoundError
+
+        with open(file, "r", encoding="UTF-8") as f:
+            reader = csv.DictReader(f)
+            data = [row for row in reader]
+        return _make_json(data)
 
 
 def json2csv(obj: list[dict[str, object]]) -> str:
@@ -92,10 +93,10 @@ if __name__ == "__main__":
     ]
 
 
-    csv_object = read_string(csv_text)
+    csv_object = CSVReader.read_string(csv_text)
     assert excepted_result == csv_object
 
-    csv_object_from_file = read_file(file)
+    csv_object_from_file = CSVReader.read_file(file)
     assert excepted_result == csv_object_from_file
 
     assert csv_text == json2csv(csv_object)

@@ -250,7 +250,7 @@ if __name__ == "__main__":
         def json(self):
             return tojson(self)
 
-        def __eq__(self, __o: object) -> bool:
+        def __eq__(self, __o: "User") -> bool:
             if not isinstance(__o, User):
                 return False
             return self.name == __o.name and self.age == __o.age

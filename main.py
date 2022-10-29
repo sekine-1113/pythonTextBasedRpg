@@ -1,0 +1,1 @@
+from ver1 import main
