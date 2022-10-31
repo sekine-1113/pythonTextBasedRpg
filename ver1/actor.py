@@ -57,4 +57,9 @@ if __name__ == "__main__":
         Stats(300, 0, 100, 50),
         0,
         Weapon("どうのつるぎ", 10)
-    ).display_stats()
+    )
+    actor.display_stats()
+    actor.stats.level = 1
+    print(f"レベル{actor.stats.level:4}")
+    print(f"HP{actor.stats.hit_point:8}")
+    print(f"MP{actor.stats.magic_power:8}")
