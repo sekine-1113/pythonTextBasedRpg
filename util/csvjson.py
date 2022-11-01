@@ -22,12 +22,11 @@ class CSVReader:
         """
         文字列からCSVを読み込み辞書型のデータのリストを返却する.
         """
-        f = io.StringIO()
-        f.write(string)
-        f.seek(0)
-        reader = csv.DictReader(f)
-        data = [row for row in reader]
-        f.close()
+        with io.StringIO() as f:
+            f.write(string)
+            f.seek(0)
+            reader = csv.DictReader(f)
+            data = [row for row in reader]
         return _make_json(data)
 
     @classmethod

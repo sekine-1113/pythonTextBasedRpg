@@ -1,4 +1,5 @@
 
+import hashlib
 import random
 import secrets
 import string
@@ -52,6 +53,10 @@ def confirm_password(hashed_pass):
     return user_password.hexdigest() == hashed_pass
 
 
+def hased(plain):
+    if isinstance(plain, bytes|bytearray):
+        return sha256(plain).hexdigest()
+    return sha256(plain.encode()).hexdigest()
 
 def main():
     hpwd = get_password()

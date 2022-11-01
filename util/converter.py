@@ -86,6 +86,7 @@ class tojson:
             if value.__class__ in cls.UNSUPPORTED:
                 print(value.__class__, "is unsupported. it converted to `str` object.")
                 value = str(value)
+
             if value is not None:
                 func = cls._funcs.get(value.__class__, cls._fromclass)
                 value = func(value)

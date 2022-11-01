@@ -15,11 +15,15 @@ class DataBase:
             self.cur.execute(f"INSERT INTO MyTable VALUES ({i}, 'myTest{i}')")
         self.cur.execute("SELECT * FROM MyTable")
         data = self.cur.fetchone()
-
-        json = {key: data[key] for key in data.keys()}
-        pprint(json)
+        self.to_json(data)
         self.conn.commit()
         self.cur.close()
+
+    def to_json(self, data):
+        json = {key: data[key] for key in data.keys()}
+        pprint(json)
+        return json
+
 
 
 if __name__ == "__main__":
