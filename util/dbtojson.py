@@ -25,6 +25,5 @@ class DataBase:
         return json
 
 
-
 if __name__ == "__main__":
     DataBase().test()
