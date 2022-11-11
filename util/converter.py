@@ -2,12 +2,11 @@ import json
 from copy import copy
 
 
-class convertError(Exception):
-    pass
-
-
-class unSupportedError(Exception):
-    pass
+class PyObjectEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, object) and hasattr(o, "__dict__"):
+            return o.__dict__
+        return super().default(o)
 
 
 class tojson:
@@ -303,3 +302,6 @@ if __name__ == "__main__":
             )
         )
     assert group == group_copy
+
+
+    print(json.dumps(group_json, cls=PyObjectEncoder, ensure_ascii=False))
