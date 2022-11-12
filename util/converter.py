@@ -4,6 +4,8 @@ from copy import copy
 
 class PyObjectEncoder(json.JSONEncoder):
     def default(self, o):
+        if isinstance(o, set|tuple):
+            return list(o)
         if isinstance(o, object) and hasattr(o, "__dict__"):
             return o.__dict__
         return super().default(o)
@@ -302,6 +304,3 @@ if __name__ == "__main__":
             )
         )
     assert group == group_copy
-
-
-    print(json.dumps(group_json, cls=PyObjectEncoder, ensure_ascii=False))
