@@ -8,7 +8,6 @@ class DataBase:
         self.conn.row_factory = sqlite3.Row
         self.cur = self.conn.cursor()
 
-
     def test(self):
         self.cur.execute("CREATE TABLE MyTable (id INTEGER, message TEXT)")
         for i in range(3):

@@ -4,12 +4,12 @@ from copy import copy
 
 class PyObjectEncoder(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, set|tuple):
-            return list(o)
         if isinstance(o, object) and hasattr(o, "__dict__"):
             return o.__dict__
         return super().default(o)
 
+def test_encoder():
+    print(json.dumps({"a":"a"}, ensure_ascii=False, cls=PyObjectEncoder))
 
 class tojson:
     """User-defined class convert to json
@@ -232,6 +232,7 @@ class tojson:
 
 
 if __name__ == "__main__":
+    test_encoder()
     assert tojson._fromint(123) == 123
     assert tojson._fromfloat(3.14) == 3.14
     assert tojson._frombool(True) == True
@@ -265,11 +266,11 @@ if __name__ == "__main__":
     assert tojson().get(int)(123) == 123
     assert tojson().get(str)("HELLO") == "HELLO"
 
-    with open("./output.json", "w", encoding="UTF-8") as f:
+    with open("./datastore/output.json", "w", encoding="UTF-8") as f:
         # json.dump(tojson(User(name="name", age=20)), f, indent=4)
         json.dump(User(name="name", age=20).json(), f, indent=4)
 
-    with open("./output.json", "r", encoding="UTF-8") as f:
+    with open("./datastore/output.json", "r", encoding="UTF-8") as f:
         user = User(**json.load(f))
 
     class Group:
@@ -289,10 +290,10 @@ if __name__ == "__main__":
     group_json = tojson({"Group": group})
     print(group_json)
 
-    with open("./output.json", "w", encoding="UTF-8") as f:
+    with open("./datastore/output.json", "w", encoding="UTF-8") as f:
         json.dump(group_json, f, indent=4, ensure_ascii=False)
 
-    with open("./output.json", "r", encoding="UTF-8") as f:
+    with open("./datastore/output.json", "r", encoding="UTF-8") as f:
         group_json = json.load(f)["Group"]
         group_json.pop("count")
         print(group_json)

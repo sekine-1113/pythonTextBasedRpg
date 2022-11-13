@@ -120,5 +120,4 @@ del mainloop, battleloop
 del command, battle_command
 del player, enemy
 del DEBUG,PROMPT
-exit()
 # ============================================================================
