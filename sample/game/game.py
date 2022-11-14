@@ -12,9 +12,10 @@ class Actor:
         self.xp = xp
         self.money = money
         self.inventory = []
+        self.render = {}
 
-    def set_render(self, render):
-        self.render = render
+    def set_render(self, key, render):
+        self.render[key] = render
 
     def get_vars(self):
         print_message("called: Actor.get_vars")
@@ -22,7 +23,7 @@ class Actor:
 
     def attack(self, skill):
         if hasattr(self, "render"):
-            self.render(self, skill)
+            self.render.get("attack")(self, skill)
         else:
             Render.attack(self, skill)
         d = AmountCalc.damage(self, skill)
