@@ -9,6 +9,7 @@ with open(file, "w") as f:
 config.read(file)
 print(config["DEFAULT"]["PATH"])
 
+
 # config.defaults()
 # config.sections()
 # config.add_section(section)
