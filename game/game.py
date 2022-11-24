@@ -1,8 +1,11 @@
 DEBUG = True
 
+class Damage:
+    def __init__(self, value) -> None:
+        self.value = value
+
 class Actor:
     def __init__(self, name, level, hit_point, magic_power, strength, defence, xp, money):
-        print_message("creating Actor object...")
         self.name = name
         self.level = level
         self.hit_point = hit_point
@@ -17,26 +20,15 @@ class Actor:
         self.render = render
 
     def get_vars(self):
-        print_message("called: Actor.get_vars")
         return self.__dict__
 
     def attack(self, skill):
-        if hasattr(self, "render"):
-            self.render(self, skill)
-        else:
-            Render.attack(self, skill)
         d = AmountCalc.damage(self, skill)
-        print_message("actor.attack")
-        print("damage is", d)
         return d
 
-    def recieve(self, source, skill):
-        Render.recieve(self, skill)
-        d = AmountCalc.damage(source, skill)
-        self.hit_point -= d
+    def recieve(self, damage):
+        self.hit_point -= damage.value
         # 副作用
-
-        print("HP:", self.hit_point)
 
 def print_message(msg, loginfo="INFO"):
     if not DEBUG:
@@ -47,6 +39,9 @@ class Skill:
     def __init__(self, name, amount):
         self.name = name
         self.amount = amount
+
+class SkillManager:
+    pass
 
 class Render:  # 名前空間
     def __init__(self):
@@ -69,15 +64,13 @@ class Render:  # 名前空間
 class AmountCalc:
     @classmethod
     def damage(self, actor, skill):
-        damage_amount = actor.strength + skill.amount
+        damage_amount = Damage(
+            actor.strength + skill.amount)
         return damage_amount
 
 
 if __name__ == "__main__":
     actor = Actor("alice", 1, 30, 10, 8, 6, 0, 0)
-    print_message("Created Actor")
-    print_message(actor.get_vars())
-    Render.print_actor(actor)
     skills = [
         Skill("Fire", 10),
         Skill("Ice", 10)
@@ -86,4 +79,4 @@ if __name__ == "__main__":
     skill = skills[using_skill_idx]
     enemy = Actor("slime", 1, 15, 8, 7, 5, 7, 10)
     damage = actor.attack(skill)
-    enemy.recieve(actor, skill)
+    enemy.recieve(damage)

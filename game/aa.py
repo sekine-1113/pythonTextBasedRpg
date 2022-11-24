@@ -7,7 +7,8 @@ class HPObject:
 
     def add(self, x):
         if x < 0:
-            raise ValueError
+            print("Warn: x is under 0")
+        x = max(0, x)
         return HPObject(self.value + x)
 
     def sub(self, x):
