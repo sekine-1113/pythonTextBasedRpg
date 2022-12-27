@@ -1,3 +1,7 @@
+from typing import TypeVar
+
+
+Name = TypeVar("Name", str)
 
 
 class Stats:
@@ -8,9 +12,7 @@ class Stats:
 
 
 class Actor:
-    _id = 0
-    def __init__(self, id_: int, name: str, stats: Stats) -> None:
-        self._id = self._id+1 if self._id else id_
+    def __init__(self, name: Name, stats: Stats) -> None:
         self.name = name
         self.stats = stats
 
@@ -21,6 +23,9 @@ class Actor:
     def isDead(self):
         return self.stats.HP <= 0
 
+    def __repr__(self) -> str:
+        return f"{self.__id} {self.name}"
+
 
 
 def onTurn(player: Actor, enemy: Actor):
@@ -28,6 +33,7 @@ def onTurn(player: Actor, enemy: Actor):
     enemy.onTurn()
 
 def battle(player: Actor, enemy: Actor):
+    print(player, enemy)
     while not player.isDead() or enemy.isDead():
         onTurn(player, enemy)
         player.stats.HP -= 10
@@ -42,7 +48,7 @@ def battle(player: Actor, enemy: Actor):
 
 def main():
     player = Actor(0, "a", Stats(200, 100, 100))
-    enemy = Actor(0, "b", Stats(200, 20, 20))
+    enemy = Actor(1, "b", Stats(200, 20, 20))
     battle(player, enemy)
 
     return 0
