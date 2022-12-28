@@ -8,7 +8,7 @@ def levenshtein(s: str, t: str) -> int:
     if not s: return lt
     if not t: return ls
 
-    dp = [ [0]*(lt+1) for _ in range(ls+1) ]
+    dp = [[0]*(lt+1) for _ in range(ls+1) ]
     for j in range(1, lt+1):
         dp[0][j] = j
     for i in range(1, ls+1):

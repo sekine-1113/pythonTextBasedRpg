@@ -15,7 +15,7 @@ def download_zip(url: str, save_filepath: Path|str) -> None:
         f.write(res.content)
 
 
-def unpack_zip(filepath: Path|str , unpacked_filepath: Path|str):
+def unpack_zip(filepath: Path|str, unpacked_filepath: Path|str):
     """ zipフォルダを解凍する.
     filepath: Zipフォルダ
     unpacked_filepath: 解凍後Zipフォルダ

@@ -1,58 +1,54 @@
-from typing import Generic, TypeVar
 
+class HitPoint:
+    def __init__(self, value: int) -> None:
+        assert isinstance(value, int)
+        self.value = value
+        self.max_value = value
+        self.min_value = 0
+
+
+class MagicPower:
+    def __init__(self, value: int) -> None:
+        assert isinstance(value, int)
+        self.value = value
+        self.max_value = value
+        self.min_value = 0
 
 class Stats:
-    def __init__(self, HP: int, STR: int, DEF: int) -> None:
-        assert isinstance(HP, int)
-        assert isinstance(STR, int)
-        assert isinstance(DEF, int)
-        self.HP = HP
-        self.STR = STR
-        self.DEF = DEF
-        assert isinstance(self.HP, int)
-        assert isinstance(self.STR, int)
-        assert isinstance(self.DEF, int)
+    def __init__(self, hit_point: HitPoint, magic_power: MagicPower) -> None:
+        assert isinstance(hit_point, HitPoint)
+        assert isinstance(magic_power, MagicPower)
+        self.hit_point = hit_point
+        self.magic_power = magic_power
 
-
-class Actor:
+class Player:
     def __init__(self, name: str, stats: Stats) -> None:
+        assert isinstance(name, str)
+        assert isinstance(stats, Stats)
         self.name = name
         self.stats = stats
 
-    def onTurn(self):
-        print(f"{self.name}'s action#")
-        print("choose your action:")
 
-    def isDead(self):
-        return self.stats.HP <= 0
+    def heal(self):
+        print(self.stats.hit_point.max_value - self.stats.hit_point.value)
+        self.stats.hit_point.value = self.stats.hit_point.max_value
 
-    def __repr__(self) -> str:
-        return f"{self.name}"
-
-
-
-def onTurn(player: Actor, enemy: Actor):
-    player.onTurn()
-    enemy.onTurn()
-
-def battle(player: Actor, enemy: Actor):
-    while not player.isDead() or enemy.isDead():
-        onTurn(player, enemy)
-        player.stats.HP -= 10
-        enemy.stats.HP -= 100
-        if player.isDead():
-            return
-        if enemy.isDead():
-            return
-
-
+    def recieve_damage(self, damage):
+        self.stats.hit_point.value -= damage
 
 
 def main():
-    player = Actor("a", Stats(200, 100, 100))
-    enemy = Actor("b", Stats(200, 20, 20))
-    battle(player, enemy)
-
+    player: Player = Player(name="アリス",
+        stats=Stats(
+            hit_point=HitPoint(1200),
+            magic_power=MagicPower(300)
+        )
+    )
+    print(player.stats.hit_point.value)
+    player.recieve_damage(1000)
+    print(player.stats.hit_point.value)
+    player.heal()
+    print(player.stats.hit_point.value)
     return 0
 
 
