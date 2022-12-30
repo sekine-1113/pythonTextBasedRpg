@@ -8,8 +8,10 @@ class PyObjectEncoder(json.JSONEncoder):
             return o.__dict__
         return super().default(o)
 
+
 def test_encoder():
     print(json.dumps({"a":"a"}, ensure_ascii=False, cls=PyObjectEncoder))
+
 
 class tojson:
     """User-defined class convert to json

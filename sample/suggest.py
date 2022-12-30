@@ -23,7 +23,7 @@ def levenshtein(s: str, t: str) -> int:
     return dp[-1][-1]
 
 
-def normalize(s, t):
+def normalize(s: str, t: str) -> float:
     return 1 - levenshtein(s, t) / max(len(s), len(t))
 
 

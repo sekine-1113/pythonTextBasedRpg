@@ -1,5 +1,12 @@
 
-class VariableStat:
+class IVariableStat:
+    def add(self, value: int) -> None: ...
+    def decrease(self, value: int) -> None: ...
+    def recover(self, value: int) -> None: ...
+    def restore(self) -> None: ...
+
+
+class VariableStat(IVariableStat):
     def __init__(self, value: int) -> None:
         assert isinstance(value, int)
         self.value: int = value
@@ -23,16 +30,9 @@ class VariableStat:
         self.value = self.max_value
 
 
-class HitPoint(VariableStat):
-    pass
-
-
-class MagicPower(VariableStat):
-    pass
-
-
-class Strength(VariableStat):
-    pass
+class HitPoint(VariableStat): pass
+class MagicPower(VariableStat): pass
+class Strength(VariableStat): pass
 
 
 class Stats:
@@ -76,6 +76,7 @@ class RunCommand:
     def execute(self):
         return False
 
+
 class Player:
     def __init__(self, name: str, job: Job, money: Money) -> None:
         assert isinstance(name, str)
@@ -86,18 +87,24 @@ class Player:
         self.money: Money = money
 
     def choose_action(self):
-        idx = int(input("#1 attack, #2 use skill #0 run> "))
+        try:
+            idx = int(input("#1 attack, #2 use skill #0 run> "))
+        except Exception:
+            idx = 1
+
         action = [
             RunCommand(),
             Command(self.attack),
-            Command(lambda: self.use_skill(skill_idx=0))
+            Command(self.use_skill)
         ]
         return action[idx]
 
     def attack(self):
         return self.job.stats.strength
 
-    def use_skill(self, skill_idx: int) -> None:
+    def use_skill(self) -> None:
+        skill_idx = int(input("> "))
+
         if not self.__has_skill(skill_idx):
             print("スキルを覚えていない!")
             return
@@ -152,6 +159,8 @@ def main():
         print(player.job.stats.strength.value)
         enemy.job.stats.hit_point.decrease(player.job.stats.strength.value)
         if enemy.is_dead():
+            print(player.name, "get", enemy.money.value, "G")
+            player.money.value += enemy.money.value
             break
 
         print(enemy.name, "attack!")

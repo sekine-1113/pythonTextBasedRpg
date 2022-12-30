@@ -16,37 +16,36 @@ def _make_json(csv_data):
         json_obj.append(inner)
     return json_obj
 
-class CSVReader:
-    @classmethod
-    def read_string(self, string: str) -> list[dict[str, object]]:
-        """
-        文字列からCSVを読み込み辞書型のデータのリストを返却する.
-        """
-        with io.StringIO() as f:
-            f.write(string)
-            f.seek(0)
-            reader = csv.DictReader(f)
-            data = [row for row in reader]
-        return _make_json(data)
 
-    @classmethod
-    def read_file(self, file: Path|str) -> list[dict[str, object]]:
-        """
-        ファイルからCSVを読み込み辞書型のデータのリストを返却する.
-        """
+def read_string(csv_string: str) -> list[dict[str, object]]:
+    """
+    文字列からCSVを読み込み辞書型のデータのリストを返却する.
+    """
+    with io.StringIO() as f:
+        f.write(csv_string)
+        f.seek(0)
+        reader = csv.DictReader(f)
+        data = [row for row in reader]
+    return _make_json(data)
 
-        if not isinstance(file, Path|str):
-            raise TypeError
 
-        file = Path(file) if isinstance(file, str) else file
+def read_file(csv_file: Path|str) -> list[dict[str, object]]:
+    """
+    ファイルからCSVを読み込み辞書型のデータのリストを返却する.
+    """
 
-        if not file.exists():
-            raise FileNotFoundError
+    if not isinstance(csv_file, Path|str):
+        raise TypeError
 
-        with open(file, "r", encoding="UTF-8") as f:
-            reader = csv.DictReader(f)
-            data = [row for row in reader]
-        return _make_json(data)
+    file = Path(csv_file) if isinstance(csv_file, str) else csv_file
+
+    if not file.exists():
+        raise FileNotFoundError
+
+    with open(file, "r", encoding="UTF-8") as f:
+        reader = csv.DictReader(f)
+        data = [row for row in reader]
+    return _make_json(data)
 
 
 def json2csv(obj: list[dict[str, object]]) -> str:
@@ -92,10 +91,10 @@ if __name__ == "__main__":
     ]
 
 
-    csv_object = CSVReader.read_string(csv_text)
+    csv_object = read_string(csv_text)
     assert excepted_result == csv_object
 
-    csv_object_from_file = CSVReader.read_file(file)
+    csv_object_from_file = read_file(file)
     assert excepted_result == csv_object_from_file
 
     assert csv_text == json2csv(csv_object)

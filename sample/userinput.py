@@ -4,7 +4,7 @@ DEFAULT_MAX = 0
 DEFAULT_ARRAY = []
 
 
-def integer(prompt:str=DEFAULT_PROMPT) -> int:
+def integer(prompt: str=DEFAULT_PROMPT) -> int:
     user_input = input(prompt)
     try:
         user_input = int(user_input)
@@ -13,7 +13,7 @@ def integer(prompt:str=DEFAULT_PROMPT) -> int:
         return integer(prompt)
 
 
-def integer_within_range(prompt:str=DEFAULT_PROMPT, _min:int=DEFAULT_MIN, _max:int=DEFAULT_MAX) -> int:
+def integer_within_range(prompt: str=DEFAULT_PROMPT, _min: int=DEFAULT_MIN, _max: int=DEFAULT_MAX) -> int:
     user_input = input(prompt)
     try:
         user_input = int(user_input)
@@ -24,7 +24,7 @@ def integer_within_range(prompt:str=DEFAULT_PROMPT, _min:int=DEFAULT_MIN, _max:i
         return integer_within_range(prompt, _min, _max)
 
 
-def integer_within_array(prompt:str=DEFAULT_PROMPT, _array:list=DEFAULT_ARRAY) -> int:
+def integer_within_array(prompt: str=DEFAULT_PROMPT, _array: list=DEFAULT_ARRAY) -> int:
     user_input = input(prompt)
     try:
         user_input = int(user_input)

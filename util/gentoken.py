@@ -8,8 +8,8 @@ from hashlib import sha256
 
 
 
-def create_token(n: int=16):
-    """make N bits token.
+def create_token(n: int=16) -> str:
+    """create N bits token.
 
     args:
         (int) n: default = 16
@@ -23,14 +23,25 @@ def create_token(n: int=16):
     return token
 
 
-def create_id():
-    k1 = "".join(random.choices(string.ascii_uppercase, k=2))
-    k2 = "".join(random.choices(string.digits, k=4))
+def create_id(uasc_k: int=2, dig_k: int=4) -> str:
+    """create id.
+
+    args:
+        (int) uasc_k: default = 2
+        (int) dig_k: default = 4
+    returns:
+        (str) (asc_k + dig_k) bits id string.
+
+        ex. "AB1234"
+    """
+    k1 = "".join(random.choices(string.ascii_uppercase, k=uasc_k))
+    k2 = "".join(random.choices(string.digits, k=dig_k))
     user_id = k1 + k2
     return user_id
 
 
-def get_password(n: int=4):
+def get_password(n: int=4) -> str:
+    """ユーザーからnビット以上のパスワードの入力を求める"""
     password = ""
     while len(password) < n:
         password = getpass()
@@ -38,7 +49,8 @@ def get_password(n: int=4):
     return user_password.hexdigest()
 
 
-def create_random_password(n: int=16):
+def create_random_password(n: int=16) -> tuple(str):
+    """nビット以上のランダムなパスワードを作成する"""
     alnum = string.ascii_letters + string.digits
     password = "".join(secrets.choice(alnum) for _ in range(n))
     row_password = password
@@ -46,13 +58,15 @@ def create_random_password(n: int=16):
     return row_password, password.hexdigest()
 
 
-def confirm_password(hashed_pass):
+def confirm_password(hashed_pass: str) -> bool:
+    """ハッシュ化されたパスワードを引数とし、パスワードを入力して一致するかどうかを返す"""
     password = getpass("Confirm Password:")
     user_password = sha256(password.encode())
     return user_password.hexdigest() == hashed_pass
 
 
-def hased(plain):
+def hased(plain: str) -> str:
+    """プレーンテキストをハッシュ化する"""
     if isinstance(plain, bytes|bytearray):
         return sha256(plain).hexdigest()
     return sha256(plain.encode()).hexdigest()
