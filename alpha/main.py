@@ -63,7 +63,11 @@ class Job:
         self.skills: list[Skill] = [Skill("メラ", 50), Skill("メラミ", 150)]
 
 
-class Command:
+class ICommand:
+    def execute(self): ...
+
+
+class Command(ICommand):
     def __init__(self, cmd) -> None:
         self.cmd = cmd
 
@@ -72,7 +76,7 @@ class Command:
         return True
 
 
-class RunCommand:
+class RunCommand(ICommand):
     def execute(self):
         return False
 
@@ -86,7 +90,7 @@ class Player:
         self.job: Job = job
         self.money: Money = money
 
-    def choose_action(self):
+    def choose_action(self) -> ICommand:
         try:
             idx = int(input("#1 attack, #2 use skill #0 run> "))
         except Exception:
@@ -102,17 +106,17 @@ class Player:
     def attack(self):
         return self.job.stats.strength
 
-    def use_skill(self) -> None:
+    def use_skill(self) -> int:
         skill_idx = int(input("> "))
 
         if not self.__has_skill(skill_idx):
             print("スキルを覚えていない!")
-            return
+            return -1
 
         using_skill: Skill = self.job.skills[skill_idx]
         if self.job.stats.magic_power.value < using_skill.mp:
             print("MPが足りなかった!")
-            return
+            return -1
 
         self.job.stats.magic_power.decrease(using_skill.mp)
         print("using", using_skill.name, end=" ")

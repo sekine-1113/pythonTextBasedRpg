@@ -5,22 +5,33 @@ from pathlib import Path
 from pprint import pprint
 
 
-def _make_json(csv_data):
-    json_obj = []
+def _make_json(csv_data: list[dict[str, str]]) -> list[dict[str, str|int]]:
+    data: dict[str, str]
+    inner: dict[str, str|int]
+    key: str
+    value: str
+    json_obj: list = []
+
     for data in csv_data:
         inner = {}
         for key, value in data.items():
-            if value.isdecimal():
-                value = int(value)
-            inner[key] = value
+            inner[key] = int(value) if value.isdecimal() else value
         json_obj.append(inner)
+
     return json_obj
 
 
-def read_string(csv_string: str) -> list[dict[str, object]]:
+def read_string(csv_string: str) -> list[dict[str, str|int]]:
     """
     文字列からCSVを読み込み辞書型のデータのリストを返却する.
     """
+
+    if not isinstance(csv_string, str):
+        raise TypeError
+
+    f: io.StringIO
+    reader: csv.DictReader
+    data: list[dict[str, str]]
     with io.StringIO() as f:
         f.write(csv_string)
         f.seek(0)
@@ -29,7 +40,7 @@ def read_string(csv_string: str) -> list[dict[str, object]]:
     return _make_json(data)
 
 
-def read_file(csv_file: Path|str) -> list[dict[str, object]]:
+def read_file(csv_file: Path|str) -> list[dict[str, str|int]]:
     """
     ファイルからCSVを読み込み辞書型のデータのリストを返却する.
     """
@@ -37,18 +48,21 @@ def read_file(csv_file: Path|str) -> list[dict[str, object]]:
     if not isinstance(csv_file, Path|str):
         raise TypeError
 
-    file = Path(csv_file) if isinstance(csv_file, str) else csv_file
+    file: Path = Path(csv_file) if isinstance(csv_file, str) else csv_file
 
     if not file.exists():
         raise FileNotFoundError
 
+    reader: csv.DictReader
+    data: list[dict[str, str]]
     with open(file, "r", encoding="UTF-8") as f:
         reader = csv.DictReader(f)
         data = [row for row in reader]
+
     return _make_json(data)
 
 
-def json2csv(obj: list[dict[str, object]]) -> str:
+def json2csv(obj: list[dict[str, str|int]]) -> str:
     """
     jsonからcsv文字列に変換する
 
@@ -59,7 +73,12 @@ def json2csv(obj: list[dict[str, object]]) -> str:
     key,key2,...\n
     value,value2,...
     """
-    fieldnames = list(obj[0].keys())
+
+    fieldnames: list[str] = list(obj[0].keys())
+
+    f: io.StringIO
+    writer: csv.DictWriter
+    csv_string: str
     with io.StringIO() as f:
         f.seek(0)
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -70,12 +89,13 @@ def json2csv(obj: list[dict[str, object]]) -> str:
 
 
 if __name__ == "__main__":
-    file = r"D:\myscript\games\cui\textbasedrpg\datastore\text.csv"
-    csv_text = ""
+    file: str = r"D:\myscript\games\cui\textbasedrpg\datastore\text.csv"
+    csv_text: str = ""
+
     with open(file, "r", encoding="UTF-8") as f:
         csv_text = f.read()
 
-    excepted_result = [
+    excepted_result: list[dict[str, str|int]] = [
         {
             'user_id': 0,
             'user_name': 'alice',
@@ -91,10 +111,10 @@ if __name__ == "__main__":
     ]
 
 
-    csv_object = read_string(csv_text)
+    csv_object: list[dict[str, str | int]] = read_string(csv_text)
     assert excepted_result == csv_object
 
-    csv_object_from_file = read_file(file)
+    csv_object_from_file: list[dict[str, str | int]] = read_file(file)
     assert excepted_result == csv_object_from_file
 
     assert csv_text == json2csv(csv_object)

@@ -11,21 +11,21 @@ def keyGen(k: int=8) -> Key:
 
 
 def crypt(key, plain):
-    def Enc(m: str, key: Key) -> int:
+    def enc(m: str, key: Key) -> int:
         return int(m) ^ key
     encrypted = ""
     for s in plain:
         a = ord(s)
-        e = Enc(a, key)
+        e = enc(a, key)
         encrypted += chr(e)
     return encrypted
 
 def decrypt(key, crypt):
-    def Dec(m: str, key: Key) -> int:
+    def dec(m: str, key: Key) -> int:
         return int(m) ^ key
     decrypted = ""
     for s in crypt:
-        d = Dec(ord(s), key)
+        d = dec(ord(s), key)
         decrypted += chr(d)
     return decrypted
 

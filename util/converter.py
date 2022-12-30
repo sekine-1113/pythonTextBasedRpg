@@ -4,7 +4,7 @@ from copy import copy
 
 class PyObjectEncoder(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, object) and hasattr(o, "__dict__"):
+        if hasattr(o, "__dict__"):
             return o.__dict__
         return super().default(o)
 
