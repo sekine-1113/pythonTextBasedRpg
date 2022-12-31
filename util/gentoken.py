@@ -7,7 +7,6 @@ from getpass import getpass
 from hashlib import sha256
 
 
-
 def create_token(n: int=16) -> str:
     """create N bits token.
 
@@ -70,6 +69,7 @@ def hased(plain: str) -> str:
     if isinstance(plain, bytes|bytearray):
         return sha256(plain).hexdigest()
     return sha256(plain.encode()).hexdigest()
+
 
 def main():
     hpwd = get_password()

@@ -6,14 +6,14 @@ from pprint import pprint
 
 
 def _make_json(csv_data: list[dict[str, str]]) -> list[dict[str, str|int]]:
-    data: dict[str, str]
-    inner: dict[str, str|int]
-    key: str
-    value: str
-    json_obj: list = []
-
+    # data: dict[str, str]
+    # inner: dict[str, str|int]
+    # key: str
+    # value: str
+    # json_obj: list = []
+    json_obj = list()
     for data in csv_data:
-        inner = {}
+        inner = dict()
         for key, value in data.items():
             inner[key] = int(value) if value.isdecimal() else value
         json_obj.append(inner)
@@ -37,6 +37,7 @@ def read_string(csv_string: str) -> list[dict[str, str|int]]:
         f.seek(0)
         reader = csv.DictReader(f)
         data = [row for row in reader]
+
     return _make_json(data)
 
 
@@ -62,7 +63,27 @@ def read_file(csv_file: Path|str) -> list[dict[str, str|int]]:
     return _make_json(data)
 
 
-def json2csv(obj: list[dict[str, str|int]]) -> str:
+def _stringify(__obj: str|int|None) -> str:
+    if __obj is None:
+        return "None"
+    return str(__obj) if not isinstance(__obj, str) else __obj
+
+
+def jsonize(__obj: list[dict[str, str|int]]) -> list[dict[str, str]]:
+    inner: dict[str, str|int]
+    key: str
+    value: str|int
+    list_: list[dict[str, str]] = []
+    __inner: dict[str, str]
+    for inner in __obj:
+        __inner = {}
+        for key, value in inner.items():
+            __inner[key] = _stringify(value)
+        list_.append(__inner)
+    return list_
+
+
+def json2csv(__obj: list[dict[str, str|int]]) -> str:
     """
     jsonからcsv文字列に変換する
 
@@ -74,11 +95,13 @@ def json2csv(obj: list[dict[str, str|int]]) -> str:
     value,value2,...
     """
 
-    fieldnames: list[str] = list(obj[0].keys())
+    fieldnames: list[str] = list(__obj[0].keys())
 
     f: io.StringIO
     writer: csv.DictWriter
     csv_string: str
+    obj: list[dict[str, str]] = jsonize(__obj)
+
     with io.StringIO() as f:
         f.seek(0)
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -110,15 +133,16 @@ if __name__ == "__main__":
         }
     ]
 
+    csv_object: list[dict[str, str|int]] = read_string(csv_text)
 
-    csv_object: list[dict[str, str | int]] = read_string(csv_text)
     assert excepted_result == csv_object
 
-    csv_object_from_file: list[dict[str, str | int]] = read_file(file)
+    csv_object_from_file: list[dict[str, str|int]] = read_file(file)
     assert excepted_result == csv_object_from_file
 
     assert csv_text == json2csv(csv_object)
     assert csv_text == json2csv(csv_object_from_file)
+
     print("======= CSV text =======")
     print(csv_text)
     print("======= CSV to JSON =======")
