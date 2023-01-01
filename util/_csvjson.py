@@ -5,7 +5,7 @@ from pathlib import Path
 
 def _type_check(__obj, *types_):
     if isinstance(__obj, types_):
-        return
+        return True
     raise TypeError
 
 

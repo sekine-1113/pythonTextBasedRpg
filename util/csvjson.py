@@ -12,6 +12,7 @@ def _make_json(csv_data: list[dict[str, str]]) -> list[dict[str, str|int]]:
     # value: str
     # json_obj: list = []
     json_obj = list()
+
     for data in csv_data:
         inner = dict()
         for key, value in data.items():
@@ -32,6 +33,7 @@ def read_string(csv_string: str) -> list[dict[str, str|int]]:
     f: io.StringIO
     reader: csv.DictReader
     data: list[dict[str, str]]
+
     with io.StringIO() as f:
         f.write(csv_string)
         f.seek(0)
@@ -56,6 +58,7 @@ def read_file(csv_file: Path|str) -> list[dict[str, str|int]]:
 
     reader: csv.DictReader
     data: list[dict[str, str]]
+
     with open(file, "r", encoding="UTF-8") as f:
         reader = csv.DictReader(f)
         data = [row for row in reader]
