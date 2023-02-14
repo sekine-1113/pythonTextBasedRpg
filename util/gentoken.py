@@ -2,7 +2,6 @@
 import random
 import secrets
 import string
-
 from getpass import getpass
 from hashlib import sha256
 
