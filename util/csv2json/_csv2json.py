@@ -3,17 +3,15 @@ import io
 from pathlib import Path
 
 
-def _type_check(__obj, *types_):
-    if isinstance(__obj, types_):
-        return True
-    raise TypeError
+def _check_type(__obj, *types_) -> bool:
+    return isinstance(__obj, types_)
 
 
 def _make_json(csv_data):
-    json_obj = list()
+    json_obj = []
 
     for data in csv_data:
-        inner = dict()
+        inner = {}
         for key, value in data.items():
             inner[key] = int(value) if value.isdecimal() else value
         json_obj.append(inner)
@@ -26,7 +24,7 @@ def read_string(csv_string):
     文字列からCSVを読み込み辞書型のデータのリストを返却する.
     """
 
-    _type_check(csv_string, str)
+    assert _check_type(csv_string, str)
 
     with io.StringIO() as f:
         f.write(csv_string)
@@ -42,7 +40,7 @@ def read_file(csv_file):
     ファイルからCSVを読み込み辞書型のデータのリストを返却する.
     """
 
-    _type_check(csv_file, str, Path)
+    assert _check_type(csv_file, str, Path)
 
     file = Path(csv_file) if isinstance(csv_file, str) else csv_file
     if not file.exists():
@@ -55,7 +53,7 @@ def read_file(csv_file):
     return _make_json(data)
 
 
-def jsonize(__obj):
+def _jsonize(__obj):
     list_ = []
     for inner in __obj:
         __inner = {}
@@ -81,7 +79,7 @@ def json2csv(__obj):
 
     fieldnames = list(__obj[0].keys())
 
-    obj = jsonize(__obj)
+    obj = _jsonize(__obj)
 
     with io.StringIO() as f:
         f.seek(0)
@@ -95,4 +93,3 @@ def json2csv(__obj):
 
 if __name__ == "__main__":
     print(read_string("a,b,c\n0,0,0"))
-    print(read_file(r"D:\myscript\games\cui\textbasedrpg\datastore\text.csv"))

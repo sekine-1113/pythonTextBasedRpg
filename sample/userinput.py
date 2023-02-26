@@ -1,6 +1,6 @@
 DEFAULT_PROMPT = "> "
-DEFAULT_MIN = 0
-DEFAULT_MAX = 0
+DEFAULT_MIN = float("inf")
+DEFAULT_MAX = float("-inf")
 DEFAULT_ARRAY = []
 
 
@@ -9,8 +9,9 @@ def integer(prompt: str=DEFAULT_PROMPT) -> int:
     try:
         user_input = int(user_input)
         return user_input
-    except ValueError as e:
+    except ValueError:
         return integer(prompt)
+
 
 
 def integer_within_range(prompt: str=DEFAULT_PROMPT, _min: int=DEFAULT_MIN, _max: int=DEFAULT_MAX) -> int:

@@ -21,20 +21,22 @@ def create_token(n: int=16) -> str:
     return token
 
 
-def create_id(uasc_k: int=2, dig_k: int=4) -> str:
+def create_id(uasc_k: int=2, dig_k: int=4, format="") -> str:
     """create id.
 
     args:
         (int) uasc_k: default = 2
         (int) dig_k: default = 4
     returns:
-        (str) (asc_k + dig_k) bits id string.
+        (str) (uasc_k + dig_k) bits id string.
 
         ex. "AB1234"
     """
     k1 = "".join(random.choices(string.ascii_uppercase, k=uasc_k))
     k2 = "".join(random.choices(string.digits, k=dig_k))
     user_id = k1 + k2
+    if format != "":
+        user_id = format.format(k1, k2)
     return user_id
 
 
@@ -47,7 +49,7 @@ def get_password(n: int=4) -> str:
     return user_password.hexdigest()
 
 
-def create_random_password(n: int=16) -> tuple(str):
+def create_random_password(n: int=16) -> tuple[str]:
     """nビット以上のランダムなパスワードを作成する"""
     alnum = string.ascii_letters + string.digits
     password = "".join(secrets.choice(alnum) for _ in range(n))
@@ -76,5 +78,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    print(create_id(0, 6))
+
 

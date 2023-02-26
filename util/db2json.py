@@ -1,5 +1,4 @@
 import sqlite3
-from pprint import pprint
 
 
 class DataBase:
@@ -13,14 +12,14 @@ class DataBase:
         for i in range(3):
             self.cur.execute(f"INSERT INTO MyTable VALUES ({i}, 'myTest{i}')")
         self.cur.execute("SELECT * FROM MyTable")
-        data = self.cur.fetchone()
-        self.to_json(data)
+        data = self.cur.fetchall()
+        data = map(self.to_json, data)
         self.conn.commit()
         self.cur.close()
 
+
     def to_json(self, data):
         json = {key: data[key] for key in data.keys()}
-        pprint(json)
         return json
 
 
