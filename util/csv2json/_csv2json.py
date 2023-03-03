@@ -83,7 +83,7 @@ def json2csv(__obj):
 
     with io.StringIO() as f:
         f.seek(0)
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(f, fieldnames=fieldnames, doublequote=True, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         writer.writerows(obj)
         csv_string = f.getvalue()
