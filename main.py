@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class Stat:
     def __init__(self, value):
         self.value = max(0, value)
@@ -11,19 +12,22 @@ class Stat:
 class HP(Stat):
     pass
 
+
 class Attack(Stat):
     pass
 
 
 
 class Actor:
-    def __init__(self, name, hp, atk) -> None:
+    def __init__(self, name, hp, atk, level=1, exp=0) -> None:
         self.name = name
         self.hp = hp
         self.atk = atk
+        self.level = level
+        self.exp = exp
 
     def print_status(self) -> None:
-        print(f"{self.name} HP:{self.hp.value} ATK:{self.atk.value}")
+        print(f"{self.name} HP:{self.hp.value} ATK:{self.atk.value} EXP:{self.exp}")
 
     def is_dead(self) -> bool:
         return self.hp.value <= 0
@@ -37,6 +41,10 @@ class Actor:
 
     def clone(self):
         pass
+
+    def on_turn_end(self):
+        pass
+
 
 
 
@@ -53,7 +61,7 @@ class Player(Actor):
         return Player(self.name, self.hp, self.atk)
 
     def on_turn(self, target):
-        command = int(input("[1]Attack [0]Run\n>"))
+        command = int(input("[1]Attack [0]Run\n> "))
         match command:
             case 0:
                 print("にげた!")
@@ -63,16 +71,31 @@ class Player(Actor):
         return True
 
 
+
+    def earn_exp(self, exp):
+        self.exp += exp
+        if self.exp >= 30000:
+            self.exp = self.exp % 30000
+            self.level_up()
+
+
+    def level_up(self):
+        print(f"{self.name}はレベルが1上がった!")
+        self.level += 1
+        self.hp = HP(int(self.hp.value * 1.25))
+        self.atk = Attack(int(self.atk.value * 1.25))
+
+
 class Enemy(Actor):
-    def __init__(self, name, hp, atk) -> None:
-        super().__init__(name, hp, atk)
+    def __init__(self, name, hp, atk, exp) -> None:
+        super().__init__(name, hp, atk, exp=exp)
 
     def show_attack_message(self, target, dmg):
         print(self.name, "の", "こうげき")
         print(target.name, "は", dmg, "ダメージを受けた!")
 
     def clone(self) -> "Enemy":
-        return Enemy(self.name, self.hp, self.atk)
+        return Enemy(self.name, self.hp, self.atk, self.exp)
 
     def on_turn(self, target):
         command = 1
@@ -88,7 +111,7 @@ class Enemy(Actor):
 if __name__ == "__main__":
 
     player = Player("アリス", HP(300), Attack(120))
-    enemy = Enemy("スライム", HP(180), Attack(90))
+    enemy = Enemy("スライム", HP(180), Attack(90), 299909)
 
     clone_player = player.clone()
     clone_enemy = enemy.clone()
@@ -107,6 +130,7 @@ if __name__ == "__main__":
 
         if enemy.is_dead():
             print(enemy.name,"を倒した!")
+            clone_player.earn_exp(enemy.exp)
             break
 
         result = enemy.on_turn(player)
@@ -121,8 +145,10 @@ if __name__ == "__main__":
         enemy.print_status()
 
 
-    player.print_status()
-    enemy.print_status()
+
 
     player = clone_player
     enemy = clone_enemy
+
+    player.print_status()
+    enemy.print_status()
