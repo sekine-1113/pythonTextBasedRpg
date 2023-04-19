@@ -1,0 +1,162 @@
+{
+    "1": {
+        "hp": 12,
+        "mp": 0,
+        "atk": 6,
+        "def": 4,
+        "nextExp": 7,
+        "totalExp": 0
+    },
+    "2": {
+        "hp": 16,
+        "mp": 4,
+        "atk": 8,
+        "def": 6,
+        "nextExp": 12,
+        "totalExp": 7
+    },
+    "3": {
+        "hp": 20,
+        "mp": 8,
+        "atk": 10,
+        "def": 8,
+        "nextExp": 18,
+        "totalExp": 19
+    },
+    "4": {
+        "hp": 24,
+        "mp": 12,
+        "atk": 12,
+        "def": 10,
+        "nextExp": 24,
+        "totalExp": 37
+    },
+    "5": {
+        "hp": 28,
+        "mp": 16,
+        "atk": 14,
+        "def": 12,
+        "nextExp": 30,
+        "totalExp": 61
+    },
+    "6": {
+        "hp": 32,
+        "mp": 20,
+        "atk": 16,
+        "def": 14,
+        "nextExp": 36,
+        "totalExp": 91
+    },
+    "7": {
+        "hp": 36,
+        "mp": 24,
+        "atk": 18,
+        "def": 16,
+        "nextExp": 42,
+        "totalExp": 127
+    },
+    "8": {
+        "hp": 40,
+        "mp": 28,
+        "atk": 20,
+        "def": 18,
+        "nextExp": 47,
+        "totalExp": 169
+    },
+    "9": {
+        "hp": 44,
+        "mp": 32,
+        "atk": 22,
+        "def": 20,
+        "nextExp": 53,
+        "totalExp": 216
+    },
+    "10": {
+        "hp": 48,
+        "mp": 36,
+        "atk": 24,
+        "def": 22,
+        "nextExp": 59,
+        "totalExp": 269
+    },
+    "11": {
+        "hp": 52,
+        "mp": 40,
+        "atk": 26,
+        "def": 24,
+        "nextExp": 65,
+        "totalExp": 328
+    },
+    "12": {
+        "hp": 56,
+        "mp": 44,
+        "atk": 28,
+        "def": 26,
+        "nextExp": 70,
+        "totalExp": 393
+    },
+    "13": {
+        "hp": 60,
+        "mp": 48,
+        "atk": 30,
+        "def": 28,
+        "nextExp": 76,
+        "totalExp": 463
+    },
+    "14": {
+        "hp": 64,
+        "mp": 52,
+        "atk": 32,
+        "def": 30,
+        "nextExp": 82,
+        "totalExp": 539
+    },
+    "15": {
+        "hp": 68,
+        "mp": 56,
+        "atk": 34,
+        "def": 32,
+        "nextExp": 88,
+        "totalExp": 621
+    },
+    "16": {
+        "hp": 72,
+        "mp": 60,
+        "atk": 36,
+        "def": 34,
+        "nextExp": 94,
+        "totalExp": 709
+    },
+    "17": {
+        "hp": 76,
+        "mp": 64,
+        "atk": 38,
+        "def": 36,
+        "nextExp": 99,
+        "totalExp": 803
+    },
+    "18": {
+        "hp": 80,
+        "mp": 68,
+        "atk": 40,
+        "def": 38,
+        "nextExp": 105,
+        "totalExp": 902
+    },
+    "19": {
+        "hp": 84,
+        "mp": 72,
+        "atk": 42,
+        "def": 40,
+        "nextExp": 111,
+        "totalExp": 1007
+    },
+    "20": {
+        "hp": 88,
+        "mp": 76,
+        "atk": 44,
+        "def": 42,
+        "nextExp": 117,
+        "totalExp": 1118
+    }
+}
